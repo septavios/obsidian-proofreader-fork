@@ -1,7 +1,7 @@
 {
 	"id": "proofreader",
 	"name": "Proofreader",
-	"description": "AI-based proofreading of your writing inserts changes as suggestions, similar to MS Word.",
+	"description": "AI-based proofreading of your writing. Inserts changes as suggestions right in the editor, similar annotations in word processing apps.",
 	"version": "0.1.0",
 	"minAppVersion": "1.5.8",
 	"isDesktopOnly": false,

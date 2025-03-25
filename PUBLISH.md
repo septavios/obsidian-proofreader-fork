@@ -7,8 +7,8 @@
   {
     "id": "proofreader",
     "name": "Proofreader",
-    "author": "pseudometa",
-    "description": "AI-based proofreading of your writing inserts changes as suggestions, similar to MS Word.",
+    "author": "pseudometa (aka Chris Grieser)",
+    "description": "AI-based proofreading of your writing. Inserts changes as suggestions right in the editor, similar annotations in word processing apps.",
     "repo": "chrisgrieser/proofreader"
   }
 ```
