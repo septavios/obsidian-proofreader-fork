@@ -1,13 +1,13 @@
 {
-	"id": "{{plugin-id}}",
-	"name": "{{plugin-name}}",
-	"description": "{{plugin-desc}}",
+	"id": "proofreader",
+	"name": "Proofreader",
+	"description": "AI-based proofreading of your writing inserts changes as suggestions, similar to MS Word.",
 	"version": "0.1.0",
 	"minAppVersion": "1.5.8",
 	"isDesktopOnly": false,
 	"author": "pseudometa (aka Chris Grieser)",
 	"authorUrl": "https://chris-grieser.de/",
-	"helpUrl": "https://github.com/{{plugin-repo}}#readme",
+	"helpUrl": "https://github.com/chrisgrieser/obsidian-proofreader#readme",
 	"fundingUrl": {
 		"Ko-Fi": "https://ko-fi.com/pseudometa",
 		"PayPal": "https://www.paypal.me/ChrisGrieser"

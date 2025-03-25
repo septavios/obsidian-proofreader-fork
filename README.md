@@ -1,8 +1,10 @@
-# {{plugin-name}}
-<!--PENDING admission in plugin store ![Obsidian Downloads](https://img.shields.io/badge/dynamic/json?logo=obsidian&color=%23483699&label=downloads&query=%24%5B%22{{plugin-id}}%22%5D.downloads&url=https%3A%2F%2Fraw.githubusercontent.com%2Fobsidianmd%2Fobsidian-releases%2Fmaster%2Fcommunity-plugin-stats.json&style=plastic)-->
-![Last Release](https://img.shields.io/github/v/release/chrisgrieser/{{plugin-id}}?label=Latest%20Release&style=plastic)
+# Proofreader
+<!-- PENDING admission in plugin store -->
+<!-- ![Obsidian Downloads](https://img.shields.io/badge/dynamic/json?logo=obsidian&color=%23483699&label=downloads&query=%24%5B%22proofreader%22%5D.downloads&url=https%3A%2F%2Fraw.githubusercontent.com%2Fobsidianmd%2Fobsidian-releases%2Fmaster%2Fcommunity-plugin-stats.json&style=plastic)-->
+![Last release](https://img.shields.io/github/v/release/chrisgrieser/proofreader?label=Latest%20Release&style=plastic)
 
-{{plugin-desc}}
+AI-based proofreading of your writing inserts changes as suggestions, similar to
+MS Word.
 
 <!-- toc -->
 
@@ -16,7 +18,7 @@
 For now, the plugin is still in beta. It can be installed with the [BRAT Plugin](https://github.com/TfTHacker/obsidian42-brat).
 
 <!-- PENDING admission in plugin store -->
-<!-- ➡️ [Install in Obsidian](https://obsidian.md/plugins?id={{plugin-id}}) -->
+<!-- ➡️ [Install in Obsidian](https://obsidian.md/plugins?id=proofreader) -->
 
 ### Development
 

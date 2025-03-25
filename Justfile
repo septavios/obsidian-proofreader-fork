@@ -1,6 +1,6 @@
 set quiet := true
 
-test_vault := "$HOME/Vaults/phd-data-analysis"
+test_vault := "$HOME/Vaults/main-vault/"
 
 #───────────────────────────────────────────────────────────────────────────────
 
@@ -8,7 +8,9 @@ test_vault := "$HOME/Vaults/phd-data-analysis"
 build-and-reload:
     #!/usr/bin/env zsh
     node .esbuild.mjs
-    cp -f "main.js" "{{ test_vault }}/.obsidian/plugins/quadro/main.js"
+    mkdir -p "{{ test_vault }}/.obsidian/plugins/proofreader/"
+    cp -f "main.js" "{{ test_vault }}/.obsidian/plugins/proofreader/main.js"
+    cp -f "manifest.json" "{{ test_vault }}/.obsidian/plugins/proofreader/manifest.json"
     vault_name=$(basename "{{ test_vault }}")
     open "obsidian://open?vault=$vault_name"
 

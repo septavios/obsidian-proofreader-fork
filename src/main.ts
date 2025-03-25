@@ -1,7 +1,7 @@
 import { Plugin } from "obsidian";
 
 // biome-ignore lint/style/noDefaultExport: required for Obsidian plugins to work
-export default class {{plugin-class}} extends Plugin {
+export default class Proofreader extends Plugin {
 	cssclass = this.manifest.id;
 
 	override onload() {

@@ -5,10 +5,10 @@
 ```json
 },
   {
-    "id": "{{plugin-id}}",
-    "name": "{{plugin-name}}",
+    "id": "proofreader",
+    "name": "Proofreader",
     "author": "pseudometa",
-    "description": "{{plugin-desc}}",
-    "repo": "chrisgrieser/{{plugin-id}}"
+    "description": "AI-based proofreading of your writing inserts changes as suggestions, similar to MS Word.",
+    "repo": "chrisgrieser/proofreader"
   }
 ```
