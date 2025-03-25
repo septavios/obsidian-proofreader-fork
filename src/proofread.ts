@@ -42,7 +42,7 @@ async function openAiRequest(oldText: string): Promise<string | undefined> {
 }
 
 export async function proofreadParagraph(editor: Editor): Promise<void> {
-	new Notice("Sending proofread request…");
+	new Notice("🤖 Sending proofread request…");
 	const cursor = editor.getCursor();
 	const oldText = editor.getLine(cursor.line);
 	const newText = await openAiRequest(oldText);
