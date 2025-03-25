@@ -7,6 +7,3 @@ node_modules
 # obsidian
 data.json
 main.js
-
-# api key etc.
-.env
