@@ -2,7 +2,7 @@
 	"id": "proofreader",
 	"name": "Proofreader",
 	"description": "AI-based proofreading of your writing. Inserts changes as suggestions right in the editor, similar annotations in word processing apps.",
-	"version": "0.1.0",
+	"version": "0.5.0",
 	"minAppVersion": "1.5.8",
 	"isDesktopOnly": false,
 	"author": "pseudometa (aka Chris Grieser)",
