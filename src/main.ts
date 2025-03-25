@@ -1,24 +1,19 @@
 import { Plugin } from "obsidian";
+import { proofreadParagraph } from "./proofread";
 
 // biome-ignore lint/style/noDefaultExport: required for Obsidian plugins to work
 export default class Proofreader extends Plugin {
-	cssclass = this.manifest.id;
-
 	override onload(): void {
 		console.info(this.manifest.name + " Plugin loaded.");
 
 		this.addCommand({
-			id: "command-id",
-			name: "Command Name",
-			callback: (): void => this.myFunction(),
+			id: "proofread-paragraph",
+			name: "Proofread current paragraph",
+			editorCallback: (editor): Promise<void> => proofreadParagraph(editor),
 		});
 	}
 
 	override onunload(): void {
 		console.info(this.manifest.name + " Plugin unloaded.");
-	}
-
-	myFunction(): void {
-		console.info("Hello World");
 	}
 }
