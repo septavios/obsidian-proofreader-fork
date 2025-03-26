@@ -45,7 +45,7 @@ async function openAiRequest(
 			headers: { Authorization: "Bearer " + settings.openAiApiKey },
 			body: JSON.stringify({
 				model: OPENAI_MODEL,
-				messages: [{ role: "user", content: STATIC_PROMPT + oldText }],
+				messages: [{ role: "user", content: STATIC_PROMPT + " " + oldText }],
 			}),
 		});
 	} catch (error) {
@@ -83,14 +83,14 @@ export async function proofread(plugin: Proofreader, editor: Editor): Promise<vo
 	const oldText = selection || editor.getLine(cursor.line);
 
 	// GUARD
-	const mode = selection === "" ? "paragraph" : "selection";
+	const mode = selection === "" ? "Paragraph" : "Selection";
 	if (oldText.trim() === "") {
-		new Notice(`Current ${mode} is empty.`, 6000);
+		new Notice(`${mode} is empty.`);
 		return;
 	}
 	if (oldText.match(/==|~~/)) {
 		const warnMsg =
-			`Current ${mode} already has highlights or strikethroughs. \n\n` +
+			`${mode} already has highlights or strikethroughs. \n\n` +
 			"Please accept/reject the changes before making another proofreading request.";
 		new Notice(warnMsg, 6000);
 		return;

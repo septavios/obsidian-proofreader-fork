@@ -32,7 +32,8 @@ word processing apps.
 
 > [!NOTE]
 > This plugin requires an **OpenAI API key** and incurs costs at OpenAI
-> depending on usage. During usage, the platform makes network requests.
+> based on usage. A network requests are made when running the proofreading
+> command.
 
 ## Installation & setup
 <!-- PENDING admission in plugin store -->
