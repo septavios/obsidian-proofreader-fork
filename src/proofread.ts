@@ -4,7 +4,6 @@ import Proofreader from "./main";
 import { OPENAI_MODEL, ProofreaderSettings, STATIC_PROMPT } from "./settings";
 
 // DOCS https://github.com/kpdecker/jsdiff#readme
-/* -> additions as ==highlights== & removals as ~~strikethroughs~~ */
 function getDiffMarkdown(oldText: string, newText: string): string {
 	const diff = diffWords(oldText, newText);
 
@@ -33,7 +32,7 @@ async function openAiRequest(
 		new Notice("Please set your OpenAI API key in the plugin settings.");
 		return;
 	}
-	new Notice("🤖 Sending proofread request…");
+	const notice = new Notice("🤖 Sending proofread request…");
 
 	// DOCS https://platform.openai.com/docs/api-reference/chat
 	let response: RequestUrlResponse;
@@ -50,6 +49,7 @@ async function openAiRequest(
 			}),
 		});
 	} catch (error) {
+		notice.hide();
 		if ((error as { status: number }).status === 401) {
 			new Notice("OpenAI API key is not valid. Please check the key in the plugin settings.");
 			return;
@@ -58,6 +58,7 @@ async function openAiRequest(
 		console.error("Proofreader plugin error:", error);
 		return;
 	}
+	notice.hide();
 
 	const newText = response.json?.choices?.[0]?.message?.content;
 	if (!newText) {
@@ -76,12 +77,12 @@ export async function proofread(plugin: Proofreader, editor: Editor): Promise<vo
 	// GUARD
 	const mode = selection === "" ? "paragraph" : "selection";
 	if (oldText.trim() === "") {
-		new Notice(`🤖 Current ${mode} is empty.`, 6000);
+		new Notice(`Current ${mode} is empty.`, 6000);
 		return;
 	}
 	if (oldText.match(/==|~~/)) {
 		const warnMsg =
-			`🤖 Current ${mode} already has highlights or strikethroughs. \n\n` +
+			`Current ${mode} already has highlights or strikethroughs. \n\n` +
 			"Please accept/reject the changes before making another proofreading request.";
 		new Notice(warnMsg, 6000);
 		return;
