@@ -15,18 +15,21 @@ export default class Proofreader extends Plugin {
 		// commands
 		this.addCommand({
 			id: "proofread",
-			name: "Proofread current paragraph/selection",
+			name: "Proofread selection/paragraph",
 			editorCallback: (editor): Promise<void> => proofread(this, editor),
+			icon: "bot-message-square",
 		});
 		this.addCommand({
 			id: "accept-suggestions",
-			name: "Accept all suggestions for current paragraph/selection",
+			name: "Accept suggestions for selection/paragraph",
 			editorCallback: (editor): void => acceptOrReject(editor, "accept"),
+			icon: "check-check",
 		});
 		this.addCommand({
 			id: "reject-suggestions",
-			name: "Reject all suggestions for current paragraph/selection",
+			name: "Reject suggestions for selection/paragraph",
 			editorCallback: (editor): void => acceptOrReject(editor, "reject"),
+			icon: "x",
 		});
 
 		console.info(this.manifest.name + " Plugin loaded.");
