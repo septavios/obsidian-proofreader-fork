@@ -1,16 +1,23 @@
 # Proofreader
 <!-- PENDING admission in plugin store -->
 <!-- ![Obsidian Downloads](https://img.shields.io/badge/dynamic/json?logo=obsidian&color=%23483699&label=downloads&query=%24%5B%22proofreader%22%5D.downloads&url=https%3A%2F%2Fraw.githubusercontent.com%2Fobsidianmd%2Fobsidian-releases%2Fmaster%2Fcommunity-plugin-stats.json&style=plastic)-->
-![Last release](https://img.shields.io/github/v/release/chrisgrieser/proofreader?label=Latest%20Release&style=plastic)
+![GitHub download count](https://img.shields.io/github/downloads/chrisgrieser/obsidian-proofreader/total?label=GitHub%20Downloads&style=plastic)
+![Last release](https://img.shields.io/github/v/release/chrisgrieser/obsidian-proofreader?label=Latest%20Release&style=plastic)
 
-AI-based proofreading of your writing. Inserts changes as suggestions right in
-the editor, similar annotations in word processing apps.
+AI-based proofreading and stylistic improvements for your writing. Changes are
+inserted as suggestions directly in the editor, similar to suggested changes in
+word processing apps.
+
+<img alt="Showcase" width=70% src="https://github.com/user-attachments/assets/fa77eb97-61b9-4102-b8b2-e7c385868363">
 
 <!-- toc -->
 
 - [Features](#features)
-- [Installation](#installation)
-	* [Development](#development)
+- [Installation & setup](#installation--setup)
+	* [Plugin installation](#plugin-installation)
+	* [Get an OpenAI API key](#get-an-openai-api-key)
+- [Styling of the changes](#styling-of-the-changes)
+- [Plugin development](#plugin-development)
 - [About the developer](#about-the-developer)
 
 <!-- tocstop -->
@@ -21,17 +28,47 @@ the editor, similar annotations in word processing apps.
 - Accept or reject changes with one hotkey.
 
 > [!NOTE]
-> This plugin requires an **OpenAI API key**. During usage, the platform makes
-> network requests.
+> This plugin requires an **OpenAI API key** and incurs costs at OpenAI
+> depending on usage. During usage, the platform makes network requests.
 
-## Installation
-For now, the plugin is still in beta. It can be installed with the [BRAT
-Plugin](https://github.com/TfTHacker/obsidian42-brat).
-
+## Installation & setup
 <!-- PENDING admission in plugin store -->
 <!-- ➡️ [Install in Obsidian](https://obsidian.md/plugins?id=proofreader) -->
+### Plugin installation
+1. Download the [latest release](https://github.com/chrisgrieser/obsidian-proofreader/releases/latest/download/obsidian-proofreader.zip).
+2. Open Obsidian, go to `Settings → Community Plugins`, click the folder icon.
+3. In the folder that opens, create a new folder called `obsidian-proofreader`.
+4. Unzip the downloaded release file and move all files into the folder
+   `obsidian-proofreader`.
+5. Go back to Obsidian, `Settings → Community Plugins`, and click the refresh
+   icon.
+6. `Proofreader` will now appear in your list of plugins. Enable it by checking
+   the box.
 
-### Development
+### Get an OpenAI API key
+Furthermore, the plugin requires an OpenAI API key.
+1. [Create an OpenAI account](https://auth.openai.com/create-account).
+2. Go to [this site](https://platform.openai.com/api-keys), and click `Create
+   new secret key`.
+3. Copy the API key.
+4. Go to Obsidian `Settings → Proofreader` and paste your API key there.
+
+## Styling of the changes
+You can add the following CSS snippet to make highlights and strikethroughs
+appear like suggested changes, similar to the screenshot further above. ([How to
+add CSS snippets.](https://help.obsidian.md/snippets))
+
+```css
+.cm-strikethrough {
+	text-decoration-color: var(--color-red);
+}
+
+.cm-s-obsidian span.cm-highlight {
+	background-color: rgba(var(--color-green-rgb), 35%);
+}
+```
+
+## Plugin development
 
 ```bash
 just init   # run once after cloning
@@ -51,7 +88,7 @@ digital economy. For my PhD project, I investigate the governance of the app
 economy and how software ecosystems manage the tension between innovation and
 compatibility. If you are interested in this subject, feel free to get in touch.
 
-- [Academic Website](https://chris-grieser.de/)
+- [Academic website](https://chris-grieser.de/)
 - [ResearchGate](https://www.researchgate.net/profile/Christopher-Grieser)
 - [Mastodon](https://pkm.social/@pseudometa)
 - [LinkedIn](https://www.linkedin.com/in/christopher-grieser-ba693b17a/)
