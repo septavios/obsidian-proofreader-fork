@@ -39,11 +39,11 @@ word processing apps.
 <!-- ➡️ [Install in Obsidian](https://obsidian.md/plugins?id=proofreader) -->
 ### Plugin installation
 1. Download the [latest release](https://github.com/chrisgrieser/obsidian-proofreader/releases/latest/download/obsidian-proofreader.zip).
-2. Open Obsidian, go to `Settings → Community Plugins`, click the folder icon.
-3. In the folder that opens, create a new folder called `obsidian-proofreader`.
+2. Open Obsidian, go to `Settings → Community plugins`, click the folder icon.
+3. In the folder that opens, create a new folder called `proofreader`.
 4. Unzip the downloaded release file and move all files into the folder
-   `obsidian-proofreader`.
-5. Go back to Obsidian, `Settings → Community Plugins`, and click the refresh
+   `obsidian`.
+5. Go back to Obsidian, `Settings → Community plugins`, and click the refresh
    icon.
 6. `Proofreader` will now appear in your list of plugins. Enable it by checking
    the box.
