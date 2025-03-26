@@ -54,6 +54,14 @@ async function openAiRequest(
 export async function proofreadParagraph(plugin: Proofreader, editor: Editor): Promise<void> {
 	const cursor = editor.getCursor();
 	const oldText = editor.getLine(cursor.line);
+	if (oldText.match(/==|~~/)) {
+		const warnMsg =
+			"Current paragraph already has highlights or strikethroughs. \n\n" +
+			"Please accept/reject the changes before making another proofreading request.";
+		new Notice(warnMsg, 6000);
+		return;
+	}
+
 	const newText = await openAiRequest(plugin.settings, oldText);
 	if (!newText) return;
 
