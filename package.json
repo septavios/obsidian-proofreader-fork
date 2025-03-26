@@ -2,7 +2,7 @@
 	"name": "Proofreader",
 	"description": "AI-based proofreading of your writing inserts changes as suggestions, similar to MS Word.",
 	"author": "Christopher Grieser",
-	"version": "0.5.2",
+	"version": "0.9.0",
 	"keywords": [],
 	"license": "MIT",
 	"main": "main.js",
