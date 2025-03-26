@@ -10,6 +10,8 @@ word processing apps.
 
 <img alt="Showcase" width=70% src="https://github.com/user-attachments/assets/fa77eb97-61b9-4102-b8b2-e7c385868363">
 
+## Table of contents
+
 <!-- toc -->
 
 - [Features](#features)

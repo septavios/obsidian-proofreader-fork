@@ -6,7 +6,10 @@ import { OPENAI_MODEL, ProofreaderSettings, STATIC_PROMPT } from "./settings";
 // DOCS https://github.com/kpdecker/jsdiff#readme
 /* -> additions as ==highlights== & removals as ~~strikethroughs~~ */
 function getDiffMarkdown(oldText: string, newText: string): string {
-	const changes = diffWords(oldText, newText)
+	const diff = diffWords(oldText, newText);
+
+	// text
+	const textWithSuggestions = diffWords(oldText, newText)
 		.map((part) => {
 			if (part.added) return `==${part.value}==`;
 			if (part.removed) return `~~${part.value}~~`;
@@ -14,7 +17,12 @@ function getDiffMarkdown(oldText: string, newText: string): string {
 		})
 		.join("");
 
-	return changes;
+	// notification
+	const changeCount = diff.filter((part) => part.added || part.removed).length;
+	const pluralS = changeCount === 1 ? "" : "s";
+	if (changeCount > 0) new Notice(`🤖 ${changeCount} change${pluralS} made.`);
+
+	return textWithSuggestions;
 }
 
 async function openAiRequest(
@@ -56,7 +64,7 @@ export async function proofreadParagraph(plugin: Proofreader, editor: Editor): P
 	const oldText = editor.getLine(cursor.line);
 	if (oldText.match(/==|~~/)) {
 		const warnMsg =
-			"Current paragraph already has highlights or strikethroughs. \n\n" +
+			"🤖 Current paragraph already has highlights or strikethroughs. \n\n" +
 			"Please accept/reject the changes before making another proofreading request.";
 		new Notice(warnMsg, 6000);
 		return;
@@ -64,6 +72,10 @@ export async function proofreadParagraph(plugin: Proofreader, editor: Editor): P
 
 	const newText = await openAiRequest(plugin.settings, oldText);
 	if (!newText) return;
+	if (newText === oldText) {
+		new Notice("✅ Nothing found to change.");
+		return;
+	}
 
 	const changes = getDiffMarkdown(oldText, newText);
 	editor.setLine(cursor.line, changes);
