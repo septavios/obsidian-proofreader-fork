@@ -60,12 +60,20 @@ async function openAiRequest(
 	}
 	notice.hide();
 
-	const newText = response.json?.choices?.[0]?.message?.content;
+	let newText = response.json?.choices?.[0]?.message?.content;
 	if (!newText) {
 		new Notice("Error. Check the console for more details.");
 		console.error("Proofreader plugin error:", response);
 		return;
 	}
+
+	// Ensure same amount of surrounding whitespace.
+	// (A selection can have surrounding whitespace, but the AI response usually
+	// removes those. This results the text effectively being trimmed.)
+	const leadingWhitespace = oldText.match(/^(\s*)/)?.[0] || "";
+	const trailingWhitespace = oldText.match(/(\s*)$/)?.[0] || "";
+	newText = newText.replace(/^(\s*)/, leadingWhitespace).replace(/(\s*)$/, trailingWhitespace);
+
 	return newText;
 }
 
