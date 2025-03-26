@@ -39,14 +39,16 @@ export class ProofreaderSettingsMenu extends PluginSettingTab {
 		containerEl.empty();
 
 		// GENERAL
-		new Setting(containerEl).setName("OpenAI API Key").addText((input) =>
+		new Setting(containerEl).setName("OpenAI API Key").addText((input) => {
+			input.inputEl.type = "password"; // obfuscates the field
+			input.inputEl.setCssProps({ width: "100%" });
 			input
 				.setPlaceholder("sk-123456789…")
 				.setValue(settings.openAiApiKey)
 				.onChange(async (value) => {
 					settings.openAiApiKey = value;
 					await this.plugin.saveSettings();
-				}),
-		);
+				});
+		});
 	}
 }
