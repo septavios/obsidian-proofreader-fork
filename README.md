@@ -18,7 +18,8 @@ word processing apps.
 - [Installation & setup](#installation--setup)
 	* [Plugin installation](#plugin-installation)
 	* [Get an OpenAI API key](#get-an-openai-api-key)
-- [Styling of the changes](#styling-of-the-changes)
+- [Usage](#usage)
+- [Visual appearance of the changes](#visual-appearance-of-the-changes)
 - [Plugin development](#plugin-development)
 - [About the developer](#about-the-developer)
 
@@ -55,7 +56,16 @@ Furthermore, the plugin requires an OpenAI API key.
 3. Copy the API key.
 4. Go to Obsidian `Settings → Proofreader` and paste your API key there.
 
-## Styling of the changes
+## Usage
+1. Use the command `Proofread current paragraph/selection` to check the selected
+   text. If there is no selection, the command will check the current paragraph
+   (line).
+2. The changes are automatically inserted.
+3. Accept or reject changes with the respective command. Same as the
+   proofreading command, the `accept` and `reject` commands affect the current
+   paragraph, if there is no selection.
+
+## Visual appearance of the changes
 You can add the following CSS snippet to make highlights and strikethroughs
 appear like suggested changes, similar to the screenshot further above. ([How to
 add CSS snippets.](https://help.obsidian.md/snippets))

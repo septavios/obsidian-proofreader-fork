@@ -59,17 +59,26 @@ async function openAiRequest(
 	return newText;
 }
 
-export async function proofreadParagraph(plugin: Proofreader, editor: Editor): Promise<void> {
+export async function proofread(plugin: Proofreader, editor: Editor): Promise<void> {
+	const selection = editor.getSelection();
 	const cursor = editor.getCursor();
-	const oldText = editor.getLine(cursor.line);
+	const oldText = selection || editor.getLine(cursor.line);
+
+	// GUARD
+	const mode = selection === "" ? "paragraph" : "selection";
+	if (oldText.trim() === "") {
+		new Notice(`🤖 Current ${mode} is empty.`, 6000);
+		return;
+	}
 	if (oldText.match(/==|~~/)) {
 		const warnMsg =
-			"🤖 Current paragraph already has highlights or strikethroughs. \n\n" +
+			`🤖 Current ${mode} already has highlights or strikethroughs. \n\n` +
 			"Please accept/reject the changes before making another proofreading request.";
 		new Notice(warnMsg, 6000);
 		return;
 	}
 
+	// PROOFREAD
 	const newText = await openAiRequest(plugin.settings, oldText);
 	if (!newText) return;
 	if (newText === oldText) {
@@ -78,6 +87,8 @@ export async function proofreadParagraph(plugin: Proofreader, editor: Editor): P
 	}
 
 	const changes = getDiffMarkdown(oldText, newText);
-	editor.setLine(cursor.line, changes);
+	if (selection) editor.replaceSelection(changes);
+	else editor.setLine(cursor.line, changes);
+
 	editor.setCursor(cursor);
 }

@@ -1,16 +1,18 @@
 import { Editor } from "obsidian";
 
 export function acceptOrReject(editor: Editor, mode: "accept" | "reject"): void {
+	const selection = editor.getSelection();
 	const { line, ch } = editor.getCursor();
 
-	const lineText = editor.getLine(line);
-	const updatedLine =
+	const text = selection || editor.getLine(line);
+	const updatedText =
 		mode === "accept"
-			? lineText.replace(/==/g, "").replace(/~~.*?~~/g, "")
-			: lineText.replace(/~~/g, "").replace(/==.*?==/g, "");
-	editor.setLine(line, updatedLine);
+			? text.replace(/==/g, "").replace(/~~.*?~~/g, "")
+			: text.replace(/~~/g, "").replace(/==.*?==/g, "");
+	if (selection) editor.replaceSelection(updatedText);
+	else editor.setLine(line, updatedText);
 
 	// keep cursor location
-	const charsLess = lineText.length - updatedLine.length;
+	const charsLess = text.length - updatedText.length;
 	editor.setCursor({ line: line, ch: Math.max(ch - charsLess, 0) });
 }
