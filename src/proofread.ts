@@ -1,5 +1,5 @@
 import { diffWords } from "diff";
-import { Editor, Notice, requestUrl } from "obsidian";
+import { Editor, Notice, RequestUrlResponse, requestUrl } from "obsidian";
 import Proofreader from "./main";
 import { OPENAI_MODEL, ProofreaderSettings, STATIC_PROMPT } from "./settings";
 
@@ -36,26 +36,35 @@ async function openAiRequest(
 	new Notice("🤖 Sending proofread request…");
 
 	// DOCS https://platform.openai.com/docs/api-reference/chat
-	const response = await requestUrl({
-		url: "https://api.openai.com/v1/chat/completions",
-		method: "POST",
-		contentType: "application/json",
-		// biome-ignore lint/style/useNamingConvention: not by me
-		headers: { Authorization: "Bearer " + settings.openAiApiKey },
-		body: JSON.stringify({
-			model: OPENAI_MODEL,
-			messages: [{ role: "user", content: STATIC_PROMPT + oldText }],
-		}),
-	});
-
-	const error = response.json.error;
-	if (error) {
-		const msg = `ERROR ${error.code}: ${error.message}`;
-		console.error(msg);
-		new Notice(msg, 4000);
+	let response: RequestUrlResponse;
+	try {
+		response = await requestUrl({
+			url: "https://api.openai.com/v1/chat/completions",
+			method: "POST",
+			contentType: "application/json",
+			// biome-ignore lint/style/useNamingConvention: not by me
+			headers: { Authorization: "Bearer " + settings.openAiApiKey },
+			body: JSON.stringify({
+				model: OPENAI_MODEL,
+				messages: [{ role: "user", content: STATIC_PROMPT + oldText }],
+			}),
+		});
+	} catch (error) {
+		if ((error as { status: number }).status === 401) {
+			new Notice("OpenAI API key is not valid. Please check the key in the plugin settings.");
+			return;
+		}
+		new Notice("Error. Check the console for more details.");
+		console.error("Proofreader plugin error:", error);
 		return;
 	}
-	const newText = response.json.choices[0].message.content;
+
+	const newText = response.json?.choices?.[0]?.message?.content;
+	if (!newText) {
+		new Notice("Error. Check the console for more details.");
+		console.error("Proofreader plugin error:", response);
+		return;
+	}
 	return newText;
 }
 
