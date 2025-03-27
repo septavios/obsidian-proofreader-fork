@@ -64,8 +64,6 @@ async function openAiRequest(
 			headers: { Authorization: "Bearer " + settings.openAiApiKey },
 			body: JSON.stringify({
 				model: OPENAI_MODEL.name,
-				// biome-ignore lint/style/useNamingConvention: not by me
-				max_completion_tokens: 10,
 				messages: [
 					{ role: "developer", content: STATIC_PROMPT },
 					{ role: "user", content: oldText },
@@ -121,7 +119,6 @@ export async function proofread(
 	editor: Editor,
 	mode: "full-text" | "selection-paragraph",
 ): Promise<void> {
-	const selection = editor.getSelection();
 	const cursor = editor.getCursor();
 	let oldText: string;
 	let scope: TextScope;
@@ -129,9 +126,12 @@ export async function proofread(
 	if (mode === "full-text") {
 		scope = "Note";
 		oldText = editor.getValue();
+	} else if (editor.somethingSelected()) {
+		scope = "Selection";
+		oldText = editor.getSelection();
 	} else {
-		scope = selection === "" ? "Paragraph" : "Selection";
-		oldText = selection || editor.getLine(cursor.line);
+		scope = "Paragraph";
+		oldText = editor.getLine(cursor.line);
 	}
 
 	// GUARD
@@ -156,13 +156,9 @@ export async function proofread(
 	}
 
 	const changes = getDiffMarkdown(oldText, newText);
-	if (scope === "Note") {
-		editor.setValue(changes);
-	} else if (scope === "Paragraph") {
-		editor.setLine(cursor.line, changes);
-	} else if (scope === "Selection") {
-		editor.replaceSelection(changes);
-	}
+	if (scope === "Note") editor.setValue(changes);
+	else if (scope === "Paragraph") editor.setLine(cursor.line, changes);
+	else if (scope === "Selection") editor.replaceSelection(changes);
 
 	editor.setCursor(cursor);
 }
