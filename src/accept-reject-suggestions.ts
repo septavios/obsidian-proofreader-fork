@@ -35,25 +35,24 @@ export function acceptOrRejectNextSuggestion(editor: Editor, mode: "accept" | "r
 	// PERF since highlights and strikethroughs do not span lines, it is safe to
 	// start searching at the beginning of the cursor line
 	const startOfCursorlineOffset = editor.posToOffset({ line: cursor.line, ch: 0 });
-	let searchPos = startOfCursorlineOffset;
-	searchPos = 0;
+	let searchStart = startOfCursorlineOffset;
 
 	let matchText = "";
 	let matchStart = 0;
 	let matchEnd = 0;
 	while (true) {
-		const nextMatch = text.slice(searchPos).match(/(==|~~)([^~=]*?)(\1)/);
+		const nextMatch = text.slice(searchStart).match(/(==|~~)([^~=]*?)(\1)/);
 		if (!nextMatch) {
 			new Notice("There are no highlights or strikethroughs until the end of the note.", 3000);
 			return;
 		}
 		matchText = nextMatch[0];
-		matchStart = searchPos + (nextMatch.index as number);
+		matchStart = searchStart + (nextMatch.index as number);
 		matchEnd = matchStart + matchText.length;
 		const cursorOnMatch = cursorOffset >= matchStart && cursorOffset <= matchEnd;
 		const cursorBeforeMatch = cursorOffset <= matchStart;
 		if (cursorOnMatch || cursorBeforeMatch) break;
-		searchPos = matchEnd + 1;
+		searchStart = matchEnd;
 	}
 
 	const matchStartPos = editor.offsetToPos(matchStart);
