@@ -77,20 +77,32 @@ async function openAiRequest(
 	return newText;
 }
 
-export async function proofread(plugin: Proofreader, editor: Editor): Promise<void> {
+export async function proofread(
+	plugin: Proofreader,
+	editor: Editor,
+	mode: "full-text" | "selection-paragraph",
+): Promise<void> {
 	const selection = editor.getSelection();
 	const cursor = editor.getCursor();
-	const oldText = selection || editor.getLine(cursor.line);
+	let oldText: string;
+	let scope: "Note" | "Paragraph" | "Selection";
+
+	if (mode === "full-text") {
+		scope = "Note";
+		oldText = editor.getValue();
+	} else {
+		scope = selection === "" ? "Paragraph" : "Selection";
+		oldText = selection || editor.getLine(cursor.line);
+	}
 
 	// GUARD
-	const mode = selection === "" ? "Paragraph" : "Selection";
 	if (oldText.trim() === "") {
 		new Notice(`${mode} is empty.`);
 		return;
 	}
 	if (oldText.match(/==|~~/)) {
 		const warnMsg =
-			`${mode} already has highlights or strikethroughs. \n\n` +
+			`${scope} already has highlights or strikethroughs. \n\n` +
 			"Please accept/reject the changes before making another proofreading request.";
 		new Notice(warnMsg, 6000);
 		return;
@@ -105,8 +117,13 @@ export async function proofread(plugin: Proofreader, editor: Editor): Promise<vo
 	}
 
 	const changes = getDiffMarkdown(oldText, newText);
-	if (selection) editor.replaceSelection(changes);
-	else editor.setLine(cursor.line, changes);
+	if (scope === "Note") {
+		editor.setValue(changes);
+	} else if (scope === "Paragraph") {
+		editor.setLine(cursor.line, changes);
+	} else if (scope === "Selection") {
+		editor.replaceSelection(changes);
+	}
 
 	editor.setCursor(cursor);
 }
