@@ -1,9 +1,9 @@
 import { diffWords } from "diff";
-import { Editor, Notice, RequestUrlResponse, requestUrl } from "obsidian";
+import { Editor, Notice, RequestUrlResponse, getFrontMatterInfo, requestUrl } from "obsidian";
 import Proofreader from "./main";
 import { OPENAI_MODEL, ProofreaderSettings, STATIC_PROMPT } from "./settings";
 
-declare type TextScope = "Note" | "Paragraph" | "Selection";
+declare type TextScope = "Document" | "Paragraph" | "Selection";
 
 //──────────────────────────────────────────────────────────────────────────────
 
@@ -117,15 +117,20 @@ async function openAiRequest(
 export async function proofread(
 	plugin: Proofreader,
 	editor: Editor,
-	mode: "full-text" | "selection-paragraph",
+	mode: "document" | "selection-paragraph",
 ): Promise<void> {
 	const cursor = editor.getCursor();
 	let oldText: string;
 	let scope: TextScope;
+	let bodyStart = 0;
+	let bodyEnd = -1;
 
-	if (mode === "full-text") {
-		scope = "Note";
-		oldText = editor.getValue();
+	if (mode === "document") {
+		scope = "Document";
+		const noteWithFrontmatter = editor.getValue();
+		bodyStart = getFrontMatterInfo(noteWithFrontmatter).contentStart || 1;
+		oldText = noteWithFrontmatter.slice(bodyStart);
+		bodyEnd = noteWithFrontmatter.length;
 	} else if (editor.somethingSelected()) {
 		scope = "Selection";
 		oldText = editor.getSelection();
@@ -156,9 +161,15 @@ export async function proofread(
 	}
 
 	const changes = getDiffMarkdown(oldText, newText);
-	if (scope === "Note") editor.setValue(changes);
-	else if (scope === "Paragraph") editor.setLine(cursor.line, changes);
-	else if (scope === "Selection") editor.replaceSelection(changes);
+	if (scope === "Document" && bodyStart) {
+		const bodyStartPos = editor.offsetToPos(bodyStart);
+		const bodyEndPos = editor.offsetToPos(bodyEnd);
+		editor.replaceRange(changes, bodyStartPos, bodyEndPos);
+	} else if (scope === "Paragraph") {
+		editor.setLine(cursor.line, changes);
+	} else if (scope === "Selection") {
+		editor.replaceSelection(changes);
+	}
 
 	editor.setCursor(cursor);
 }

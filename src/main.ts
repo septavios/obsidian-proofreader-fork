@@ -20,9 +20,9 @@ export default class Proofreader extends Plugin {
 			icon: "bot-message-square",
 		});
 		this.addCommand({
-			id: "proofread-full-note",
-			name: "Proofread full note",
-			editorCallback: (editor): Promise<void> => proofread(this, editor, "full-text"),
+			id: "proofread-full-document",
+			name: "Proofread full document",
+			editorCallback: (editor): Promise<void> => proofread(this, editor, "document"),
 			icon: "bot-message-square",
 		});
 		this.addCommand({
