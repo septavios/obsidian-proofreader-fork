@@ -16,13 +16,13 @@ export default class Proofreader extends Plugin {
 		this.addCommand({
 			id: "proofread-selection-paragraph",
 			name: "Proofread selection/paragraph",
-			editorCallback: (editor): Promise<void> => proofread(this, editor, "selection-paragraph"),
+			editorCallback: (editor): Promise<void> => proofread(this, editor, "Selection/Paragraph"),
 			icon: "bot-message-square",
 		});
 		this.addCommand({
 			id: "proofread-full-document",
 			name: "Proofread full document",
-			editorCallback: (editor): Promise<void> => proofread(this, editor, "document"),
+			editorCallback: (editor): Promise<void> => proofread(this, editor, "Document"),
 			icon: "bot-message-square",
 		});
 		this.addCommand({

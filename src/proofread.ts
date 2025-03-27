@@ -3,8 +3,6 @@ import { Editor, Notice, RequestUrlResponse, getFrontMatterInfo, requestUrl } fr
 import Proofreader from "./main";
 import { OPENAI_MODEL, ProofreaderSettings, STATIC_PROMPT } from "./settings";
 
-declare type TextScope = "Document" | "Paragraph" | "Selection";
-
 //──────────────────────────────────────────────────────────────────────────────
 
 // DOCS https://github.com/kpdecker/jsdiff#readme
@@ -31,7 +29,7 @@ function getDiffMarkdown(oldText: string, newText: string): string {
 async function openAiRequest(
 	settings: ProofreaderSettings,
 	oldText: string,
-	scope: TextScope,
+	scope: string,
 ): Promise<string | undefined> {
 	// GUARD missing API key
 	if (!settings.openAiApiKey) {
@@ -117,18 +115,16 @@ async function openAiRequest(
 export async function proofread(
 	plugin: Proofreader,
 	editor: Editor,
-	mode: "document" | "selection-paragraph",
+	scope: string, // Area of text that should be proofread
 ): Promise<void> {
 	const cursor = editor.getCursor();
 	let oldText: string;
-	let scope: TextScope;
 	let bodyStart = 0;
-	let bodyEnd = -1;
+	let bodyEnd = 0;
 
-	if (mode === "document") {
-		scope = "Document";
+	if (scope === "Document") {
 		const noteWithFrontmatter = editor.getValue();
-		bodyStart = getFrontMatterInfo(noteWithFrontmatter).contentStart || 1;
+		bodyStart = getFrontMatterInfo(noteWithFrontmatter).contentStart || 0;
 		oldText = noteWithFrontmatter.slice(bodyStart);
 		bodyEnd = noteWithFrontmatter.length;
 	} else if (editor.somethingSelected()) {
@@ -141,7 +137,7 @@ export async function proofread(
 
 	// GUARD
 	if (oldText.trim() === "") {
-		new Notice(`${mode} is empty.`);
+		new Notice(`${scope} is empty.`);
 		return;
 	}
 	if (oldText.match(/==|~~/)) {
@@ -159,9 +155,9 @@ export async function proofread(
 		new Notice("✅ Text is good, nothing change.");
 		return;
 	}
-
 	const changes = getDiffMarkdown(oldText, newText);
-	if (scope === "Document" && bodyStart) {
+
+	if (scope === "Note") {
 		const bodyStartPos = editor.offsetToPos(bodyStart);
 		const bodyEndPos = editor.offsetToPos(bodyEnd);
 		editor.replaceRange(changes, bodyStartPos, bodyEndPos);
