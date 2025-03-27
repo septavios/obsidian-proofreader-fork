@@ -10,7 +10,7 @@ function getDiffMarkdown(oldText: string, newText: string): string {
 	const diff = diffWords(oldText, newText);
 
 	// text
-	const textWithSuggestions = diffWords(oldText, newText)
+	const textWithSuggestions = diff
 		.map((part) => {
 			if (part.added) return `==${part.value}==`;
 			if (part.removed) return `~~${part.value}~~`;
