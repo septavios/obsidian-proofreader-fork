@@ -45,7 +45,10 @@ async function openAiRequest(
 			headers: { Authorization: "Bearer " + settings.openAiApiKey },
 			body: JSON.stringify({
 				model: OPENAI_MODEL,
-				messages: [{ role: "user", content: STATIC_PROMPT + " " + oldText }],
+				messages: [
+					{ role: "developer", content: STATIC_PROMPT },
+					{ role: "user", content: oldText },
+				],
 			}),
 		});
 	} catch (error) {
@@ -112,7 +115,7 @@ export async function proofread(
 	const newText = await openAiRequest(plugin.settings, oldText);
 	if (!newText) return;
 	if (newText === oldText) {
-		new Notice("✅ Nothing found to change.");
+		new Notice("✅ Text is good, nothing change.");
 		return;
 	}
 
