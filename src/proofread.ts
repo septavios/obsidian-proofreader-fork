@@ -3,6 +3,10 @@ import { Editor, Notice, RequestUrlResponse, requestUrl } from "obsidian";
 import Proofreader from "./main";
 import { OPENAI_MODEL, ProofreaderSettings, STATIC_PROMPT } from "./settings";
 
+declare type TextScope = "Note" | "Paragraph" | "Selection";
+
+//──────────────────────────────────────────────────────────────────────────────
+
 // DOCS https://github.com/kpdecker/jsdiff#readme
 function getDiffMarkdown(oldText: string, newText: string): string {
 	const diff = diffWords(oldText, newText);
@@ -27,16 +31,31 @@ function getDiffMarkdown(oldText: string, newText: string): string {
 async function openAiRequest(
 	settings: ProofreaderSettings,
 	oldText: string,
+	scope: TextScope,
 ): Promise<string | undefined> {
+	// GUARD missing API key
 	if (!settings.openAiApiKey) {
 		new Notice("Please set your OpenAI API key in the plugin settings.");
 		return;
 	}
-	const notice = new Notice("🤖 Sending proofread request…");
+	// GUARD text too long — prevent request for a request that is *likely* too
+	// long to prevent incurring a charge
+	// https://platform.openai.com/docs/guides/conversation-state?api-mode=responses#managing-context-for-text-generation
+	const estimatedMaxChars = OPENAI_MODEL.maxOutputTokens * 4; // SOURCE https://platform.openai.com/tokenizer
+	if (oldText.length > estimatedMaxChars) {
+		const overLength = Math.round(oldText.length - estimatedMaxChars);
+		const msg =
+			`The ${scope} is ~${overLength} characters too long.\n\n` +
+			`The maximum length is ~${estimatedMaxChars} characters.`;
+		new Notice(msg, 6000);
+		return;
+	}
 
-	// DOCS https://platform.openai.com/docs/api-reference/chat
+	// SEND REQUEST
+	const notice = new Notice("🤖 Sending proofread request…");
 	let response: RequestUrlResponse;
 	try {
+		// DOCS https://platform.openai.com/docs/api-reference/chat
 		response = await requestUrl({
 			url: "https://api.openai.com/v1/chat/completions",
 			method: "POST",
@@ -44,7 +63,9 @@ async function openAiRequest(
 			// biome-ignore lint/style/useNamingConvention: not by me
 			headers: { Authorization: "Bearer " + settings.openAiApiKey },
 			body: JSON.stringify({
-				model: OPENAI_MODEL,
+				model: OPENAI_MODEL.name,
+				// biome-ignore lint/style/useNamingConvention: not by me
+				max_completion_tokens: 10,
 				messages: [
 					{ role: "developer", content: STATIC_PROMPT },
 					{ role: "user", content: oldText },
@@ -63,7 +84,22 @@ async function openAiRequest(
 	}
 	notice.hide();
 
-	let newText = response.json?.choices?.[0]?.message?.content;
+	// GUARD text was too long, so we abort to prevent a cut-off text to be used
+	// for diff creation. (There is also a length check before the request is
+	// send, but it is based on estimates, and there is thus a small chance that
+	// the actual text is too long.)
+	const outputTokensUsed = response.json?.usage?.completion_tokens || 0;
+	if (outputTokensUsed > OPENAI_MODEL.maxOutputTokens) {
+		const tokensCutOff = outputTokensUsed - OPENAI_MODEL.maxOutputTokens;
+		const msg =
+			`The ${scope} is ~${tokensCutOff} tokens too long.\n\n` +
+			`The maximum length is ~${OPENAI_MODEL.maxOutputTokens} tokens.`;
+		new Notice(msg, 6000);
+		return;
+	}
+
+	// HANDLE RESPONSE
+	let newText = response.json?.choices?.[0].message.content;
 	if (!newText) {
 		new Notice("Error. Check the console for more details.");
 		console.error("Proofreader plugin error:", response);
@@ -88,7 +124,7 @@ export async function proofread(
 	const selection = editor.getSelection();
 	const cursor = editor.getCursor();
 	let oldText: string;
-	let scope: "Note" | "Paragraph" | "Selection";
+	let scope: TextScope;
 
 	if (mode === "full-text") {
 		scope = "Note";
@@ -112,7 +148,7 @@ export async function proofread(
 	}
 
 	// PROOFREAD
-	const newText = await openAiRequest(plugin.settings, oldText);
+	const newText = await openAiRequest(plugin.settings, oldText, scope);
 	if (!newText) return;
 	if (newText === oldText) {
 		new Notice("✅ Text is good, nothing change.");

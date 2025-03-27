@@ -3,7 +3,13 @@ import Proofreader from "./main";
 
 //──────────────────────────────────────────────────────────────────────────────
 
-export const OPENAI_MODEL = "gpt-4o-mini";
+// DOCS https://platform.openai.com/docs/models/gpt-4o-mini
+// `gpt-4o-mini` is much cheaper and slightly quicker, and still has
+// sufficiently good output
+export const OPENAI_MODEL = {
+	name: "gpt-4o-mini",
+	maxOutputTokens: 16_384,
+};
 
 export const STATIC_PROMPT = `
 Please make suggestions how to improve
