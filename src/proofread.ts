@@ -71,10 +71,10 @@ async function openAiRequest(
 	} catch (error) {
 		notice.hide();
 		if ((error as { status: number }).status === 401) {
-			new Notice("OpenAI API key is not valid. Please check the key in the plugin settings.");
+			new Notice("OpenAI API key is not valid. Please verify the key in the plugin settings.");
 			return;
 		}
-		new Notice("Error. Check the console for more details.");
+		new Notice("Error. Check the console for more details (ctrl+shift+i / cmd+opt+i).");
 		console.error("Proofreader plugin error:", error);
 		return;
 	}
@@ -97,7 +97,7 @@ async function openAiRequest(
 	// HANDLE RESPONSE
 	let newText = response.json?.choices?.[0].message.content;
 	if (!newText) {
-		new Notice("Error. Check the console for more details.");
+		new Notice("Error. Check the console for more details (ctrl+shift+i / cmd+opt+i).");
 		console.error("Proofreader plugin error:", response);
 		return;
 	}
@@ -115,7 +115,7 @@ async function openAiRequest(
 export async function proofread(
 	plugin: Proofreader,
 	editor: Editor,
-	scope: string, // Area of text that should be proofread
+	scope: "Document" | "Selection" | "Paragraph" | string, // Area of text that should be proofread
 ): Promise<void> {
 	const cursor = editor.getCursor();
 	let oldText: string;

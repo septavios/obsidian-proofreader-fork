@@ -28,7 +28,7 @@ export function acceptOrRejectInText(editor: Editor, mode: "accept" | "reject"):
 }
 
 export function acceptOrRejectNextSuggestion(editor: Editor, mode: "accept" | "reject"): void {
-	const cursor = editor.getCursor()
+	const cursor = editor.getCursor();
 	const cursorOffset = editor.posToOffset(cursor) + 1;
 	const text = editor.getValue();
 
