@@ -60,11 +60,12 @@ Furthermore, the plugin requires an OpenAI API key.
 ## Usage
 1. Use the command `Proofread current paragraph/selection` to check the selected
    text. If there is no selection, the command will check the current paragraph
-   (line).
+   (line). Alternatively, you can also check the whole document.
 2. The changes are automatically inserted.
-3. Accept or reject changes with the respective command. Same as the
-   proofreading command, the `accept` and `reject` commands affect the current
-   paragraph, if there is no selection.
+3. Accept/reject changes with the `Reject suggestions in selection/paragraph`.
+   Same as the proofreading command, the `accept` and `reject` commands affect
+   the current paragraph, if there is no selection. Alternatively, you can also
+   just accept/reject the next suggestion after your cursor.
 
 ## Visual appearance of the changes
 You can add the following CSS snippet to make highlights and strikethroughs

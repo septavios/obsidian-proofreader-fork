@@ -1,5 +1,5 @@
 import { Plugin } from "obsidian";
-import { acceptOrReject } from "./accept-reject-suggestions";
+import { acceptOrRejectInText, acceptOrRejectNextSuggestion } from "./accept-reject-suggestions";
 import { proofread } from "./proofread";
 import { DEFAULT_SETTINGS, ProofreaderSettings, ProofreaderSettingsMenu } from "./settings";
 
@@ -26,15 +26,27 @@ export default class Proofreader extends Plugin {
 			icon: "bot-message-square",
 		});
 		this.addCommand({
-			id: "accept-suggestions",
-			name: "Accept suggestions for selection/paragraph",
-			editorCallback: (editor): void => acceptOrReject(editor, "accept"),
+			id: "accept-suggestions-in-text",
+			name: "Accept suggestions in selection/paragraph",
+			editorCallback: (editor): void => acceptOrRejectInText(editor, "accept"),
 			icon: "check-check",
 		});
 		this.addCommand({
-			id: "reject-suggestions",
-			name: "Reject suggestions for selection/paragraph",
-			editorCallback: (editor): void => acceptOrReject(editor, "reject"),
+			id: "reject-suggestions-in-text",
+			name: "Reject suggestions in selection/paragraph",
+			editorCallback: (editor): void => acceptOrRejectInText(editor, "reject"),
+			icon: "x",
+		});
+		this.addCommand({
+			id: "accept-next-suggestion",
+			name: "Accept next suggestion",
+			editorCallback: (editor): void => acceptOrRejectNextSuggestion(editor, "accept"),
+			icon: "check-check",
+		});
+		this.addCommand({
+			id: "reject-next-suggestion",
+			name: "Reject next suggestion",
+			editorCallback: (editor): void => acceptOrRejectNextSuggestion(editor, "reject"),
 			icon: "x",
 		});
 
