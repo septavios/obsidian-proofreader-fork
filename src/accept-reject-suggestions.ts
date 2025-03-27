@@ -42,7 +42,7 @@ export function acceptOrRejectNextSuggestion(editor: Editor, mode: "accept" | "r
 	let matchStart = 0;
 	let matchEnd = 0;
 	while (true) {
-		const nextMatch = text.slice(searchPos).match(/(==|~~)(.*?)(\1)/);
+		const nextMatch = text.slice(searchPos).match(/(==|~~)([^~=]*?)(\1)/);
 		if (!nextMatch) {
 			new Notice("There are no highlights or strikethroughs until the end of the note.", 3000);
 			return;
