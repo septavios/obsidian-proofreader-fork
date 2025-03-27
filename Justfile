@@ -20,7 +20,7 @@ build-and-reload:
     open "obsidian://reload-plugin?id=$plugin_id&vault=$vault_name"
 
 check-all:
-    zsh ./.githooks/pre-commit
+    git hook run pre-commit -- "check-all"
 
 check-tsc-qf:
     npx tsc --noEmit --skipLibCheck --strict && echo "Typescript OK"
