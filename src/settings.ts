@@ -5,7 +5,7 @@ import Proofreader from "./main";
 
 // DOCS https://platform.openai.com/docs/models/gpt-4o-mini
 // `gpt-4o-mini` is much cheaper and slightly quicker, and still has
-// sufficiently good output
+// sufficiently good output. (A 2000 word document costs about 0.2 cent.)
 export const OPENAI_MODEL = {
 	name: "gpt-4o-mini",
 	maxOutputTokens: 16_384,

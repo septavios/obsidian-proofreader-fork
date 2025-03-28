@@ -67,6 +67,7 @@ async function openAiRequest(
 				],
 			}),
 		});
+		console.debug("[Proofreader plugin] OpenAI response", response);
 	} catch (error) {
 		notice.hide();
 		if ((error as { status: number }).status === 401) {
