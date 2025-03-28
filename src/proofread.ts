@@ -1,4 +1,4 @@
-import { diffWords } from "diff";
+import { Change, diffWords } from "diff";
 import { Editor, Notice, RequestUrlResponse, getFrontMatterInfo, requestUrl } from "obsidian";
 import Proofreader from "./main";
 import { OPENAI_MODEL, ProofreaderSettings, STATIC_PROMPT } from "./settings";
@@ -6,10 +6,21 @@ import { OPENAI_MODEL, ProofreaderSettings, STATIC_PROMPT } from "./settings";
 //──────────────────────────────────────────────────────────────────────────────
 
 // DOCS https://github.com/kpdecker/jsdiff#readme
-function getDiffMarkdown(oldText: string, newText: string): string {
+function getDiffMarkdown(oldText: string, newText: string, overlength?: boolean): string {
 	const diff = diffWords(oldText, newText);
 
-	// text
+	// do not remove text after cutoff-length
+	if (overlength) {
+		(diff.at(-1) as Change).removed = false;
+		const cutOffCallout =
+			"\n\n" +
+			"> [!INFO] End of proofreading\n" +
+			"> The input text text was too long. Text after this point is unchanged." +
+			"\n\n";
+		diff.splice(-2, 0, { added: false, removed: false, value: cutOffCallout });
+	}
+
+	// diff ---> ==highlights== / ~~strikethrough~~
 	const textWithSuggestions = diff
 		.map((part) => {
 			if (part.added) return `==${part.value}==`;
@@ -30,27 +41,15 @@ async function openAiRequest(
 	settings: ProofreaderSettings,
 	oldText: string,
 	scope: string,
-): Promise<string | undefined> {
-	// GUARD missing API key
+): Promise<{ newText: string; overlength: boolean } | undefined> {
+	// GUARD
 	if (!settings.openAiApiKey) {
 		new Notice("Please set your OpenAI API key in the plugin settings.");
 		return;
 	}
-	// GUARD text too long — prevent request for a request that is *likely* too
-	// long to prevent incurring a charge
-	// https://platform.openai.com/docs/guides/conversation-state?api-mode=responses#managing-context-for-text-generation
-	const estimatedMaxChars = OPENAI_MODEL.maxOutputTokens * 4; // SOURCE https://platform.openai.com/tokenizer
-	if (oldText.length > estimatedMaxChars) {
-		const overLength = Math.round(oldText.length - estimatedMaxChars);
-		const msg =
-			`The ${scope} is ~${overLength} characters too long.\n\n` +
-			`The maximum length is ~${estimatedMaxChars} characters.`;
-		new Notice(msg, 6000);
-		return;
-	}
 
 	// SEND REQUEST
-	const notice = new Notice(`🤖 Proofreading ${scope}…`);
+	const notice = new Notice(`🤖 ${scope} is being proofread…`);
 	let response: RequestUrlResponse;
 	try {
 		// DOCS https://platform.openai.com/docs/api-reference/chat
@@ -80,30 +79,12 @@ async function openAiRequest(
 	}
 	notice.hide();
 
-	// HANDLE RESPONSE
+	// GUARD
 	let newText = response.json?.choices?.[0].message.content;
 	if (!newText) {
 		new Notice("Error. Check the console for more details (ctrl+shift+i / cmd+opt+i).");
 		console.error("Proofreader plugin error:", response);
 		return;
-	}
-
-	// GUARD text too long
-	// abort to prevent a cut-off text to be used for diff creation. (There is
-	// also a length check before the request is send, but it is based on
-	// estimates, and thus a small chance that the actual text is too long.)
-	const outputTokensUsed = response.json?.usage?.completion_tokens || 0;
-	if (outputTokensUsed > OPENAI_MODEL.maxOutputTokens) {
-		const tokensCutOff = outputTokensUsed - OPENAI_MODEL.maxOutputTokens;
-		const msg =
-			`The ${scope} is ~${tokensCutOff} tokens too long to create suggestions. ` +
-			`The maximum length is ~${OPENAI_MODEL.maxOutputTokens} tokens.` +
-			"\n\n" +
-			"The cut-off, raw response-text can be retrieved from in the console (ctrl+shift+i / cmd+opt+i).";
-		new Notice(msg, 10000);
-
-		// save text in console, since the request still incurred a certain cost
-		navigator.clipboard.writeText(newText);
 	}
 
 	// Ensure same amount of surrounding whitespace
@@ -113,13 +94,24 @@ async function openAiRequest(
 	const trailingWhitespace = oldText.match(/(\s*)$/)?.[0] || "";
 	newText = newText.replace(/^(\s*)/, leadingWhitespace).replace(/(\s*)$/, trailingWhitespace);
 
-	// No changes needed
+	// GUARD
 	if (newText === oldText) {
 		new Notice("✅ Text is good, nothing to change.");
 		return;
 	}
 
-	return newText;
+	// determine if overlength
+	// https://platform.openai.com/docs/guides/conversation-state?api-mode=responses#managing-context-for-text-generation
+	const outputTokensUsed = response.json?.usage?.completion_tokens || 0;
+	const overlength = outputTokensUsed >= OPENAI_MODEL.maxOutputTokens;
+	if (overlength) {
+		const msg =
+			"Text is longer than the maximum output supported by the AI Model.\n\n" +
+			"Suggestions are thus only made until the cut-off point.";
+		new Notice(msg, 10_000);
+	}
+
+	return { newText: newText, overlength: overlength };
 }
 
 function validInputText(oldText: string, scope: string): boolean {
@@ -146,9 +138,10 @@ export async function proofreadDocument(plugin: Proofreader, editor: Editor): Pr
 	const oldText = noteWithFrontmatter.slice(bodyStart);
 
 	if (!validInputText(oldText, "Document")) return;
-	const newText = await openAiRequest(plugin.settings, oldText, "Document");
+	const { newText, overlength } =
+		(await openAiRequest(plugin.settings, oldText, "Document")) || {};
 	if (!newText) return;
-	const changes = getDiffMarkdown(oldText, newText);
+	const changes = getDiffMarkdown(oldText, newText, overlength);
 
 	const bodyStartPos = editor.offsetToPos(bodyStart);
 	const bodyEndPos = editor.offsetToPos(bodyEnd);
@@ -166,13 +159,13 @@ export async function proofreadSelectionParagraph(
 	const scope = selection ? "Selection" : "Paragraph";
 
 	if (!validInputText(oldText, scope)) return;
-	const newText = await openAiRequest(plugin.settings, oldText, scope);
+	const { newText, overlength } = (await openAiRequest(plugin.settings, oldText, scope)) || {};
 	if (!newText) return;
-	const changes = getDiffMarkdown(oldText, newText);
+	const changes = getDiffMarkdown(oldText, newText, overlength);
 
 	if (selection) {
 		editor.replaceSelection(changes);
-		editor.setCursor(cursor);  // to start of selection
+		editor.setCursor(cursor); // to start of selection
 	} else {
 		editor.setLine(cursor.line, changes);
 		editor.setCursor({ line: cursor.line, ch: 0 }); // to start of paragraph
