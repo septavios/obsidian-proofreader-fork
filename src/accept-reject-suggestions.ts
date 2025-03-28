@@ -13,11 +13,11 @@ function positionVisibleOnScreen(editor: Editor, pos: EditorPosition): boolean {
 
 	// FIX typo-casting as `unknown` and then actual type, since CodeMirror's and
 	// Obsidian's typing are incomplete
-	const coord = editor.cm.coordsForChar(offset) as unknown as { y: number };
-	if (!coord) return false;
+	const coord = editor.cm.coordsAtPos(offset);
+	if (!coord) return false; // no coord = outside viewport
 	const view = editor.getScrollInfo() as unknown as { clientHeight: number };
 
-	const visible = coord.y < view.clientHeight && coord.y > 0;
+	const visible = coord.top < view.clientHeight && coord.top > 0;
 	return visible;
 }
 
