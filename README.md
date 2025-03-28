@@ -29,12 +29,12 @@ word processing apps.
 - Suggested changes are inserted directly into the text: Additions as
   `==highlights==` and removals as `~~strikethroughs~~`.
 - Accept or reject changes with just one hotkey.
-- Estimated costs: For 10,000 English words input text, the cost is about $0.01.
+- Estimated costs: For 10,000 English words input text, the cost should be less
+  than $0.05. (Based on OpenAI's usage pricing in March 2025.)
 
 > [!NOTE]
-> This plugin requires an **OpenAI API key** and incurs costs at OpenAI
-> based on usage. A network requests are made when running the proofreading
-> command.
+> This plugin requires an **OpenAI API key** and incurs costs at OpenAI based on
+> usage. A network requests are made when running the proofreading command.
 
 ## Installation & setup
 <!-- PENDING admission in plugin store -->
@@ -59,14 +59,20 @@ Furthermore, the plugin requires an OpenAI API key.
 4. Go to Obsidian `Settings → Proofreader` and paste your API key there.
 
 ## Usage
-1. Use the command `Proofread current paragraph/selection` to check the selected
+1. Use the command `Proofread selection/paragraph` to check the selected
    text. If there is no selection, the command will check the current paragraph
-   (line). Alternatively, you can also check the whole document.
+   (line). Alternatively, you can also check the whole document with `Proofread
+   full document`.
 2. The changes are automatically inserted.
-3. Accept/reject changes with the `Reject suggestions in selection/paragraph`.
+3. Accept/reject changes with the `Accept suggestions in selection/paragraph`.
    Same as the proofreading command, the `accept` and `reject` commands affect
    the current paragraph, if there is no selection. Alternatively, you can also
-   just accept/reject the next suggestion after your cursor.
+   just accept/reject the next suggestion after your cursor via `Accept next
+   suggestion`.
+
+> [!TIP]
+> The usage costs should not be very high, nonetheless you can track them
+> [on this page](https://platform.openai.com/usage).
 
 ## Visual appearance of the changes
 You can add the following CSS snippet to make highlights and strikethroughs
