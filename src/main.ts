@@ -39,13 +39,13 @@ export default class Proofreader extends Plugin {
 		});
 		this.addCommand({
 			id: "accept-next-suggestion",
-			name: "Accept next suggestion",
+			name: "Accept next suggestion (or go to suggestion if outside viewport)",
 			editorCallback: (editor): void => acceptOrRejectNextSuggestion(editor, "accept"),
 			icon: "check-check",
 		});
 		this.addCommand({
 			id: "reject-next-suggestion",
-			name: "Reject next suggestion",
+			name: "Reject next suggestion (or go to suggestion if outside viewport)",
 			editorCallback: (editor): void => acceptOrRejectNextSuggestion(editor, "reject"),
 			icon: "x",
 		});

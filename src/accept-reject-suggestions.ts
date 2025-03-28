@@ -1,10 +1,27 @@
-import { Editor, Notice } from "obsidian";
+import { Editor, EditorPosition, Notice } from "obsidian";
 
 function updateText(text: string, mode: "accept" | "reject"): string {
 	return mode === "accept"
 		? text.replace(/==/g, "").replace(/~~.*?~~/g, "")
 		: text.replace(/~~/g, "").replace(/==.*?==/g, "");
 }
+
+// Manually calculating the visibility of an offset is necessary, since
+// CodeMirror's viewport includes extra margin around the visible area.
+function positionVisibleOnScreen(editor: Editor, pos: EditorPosition): boolean {
+	const offset = editor.posToOffset(pos);
+
+	// FIX typo-casting as `unknown` and then actual type, since CodeMirror's and
+	// Obsidian's typing are incomplete
+	const coord = editor.cm.coordsForChar(offset) as unknown as { y: number };
+	if (!coord) return false;
+	const view = editor.getScrollInfo() as unknown as { clientHeight: number };
+
+	const visible = coord.y < view.clientHeight && coord.y > 0;
+	return visible;
+}
+
+//──────────────────────────────────────────────────────────────────────────────
 
 export function acceptOrRejectInText(editor: Editor, mode: "accept" | "reject"): void {
 	const selection = editor.getSelection();
@@ -32,7 +49,15 @@ export function acceptOrRejectNextSuggestion(editor: Editor, mode: "accept" | "r
 	const cursorOffset = editor.posToOffset(cursor) + 1;
 	const text = editor.getValue();
 
-	// PERF since highlights and strikethroughs do not span lines, it is safe to
+	// CASE 1: if cursor not visible, scroll to it instead
+	if (!positionVisibleOnScreen(editor, cursor)) {
+		new Notice("Cursor is not visible. Scrolling to it instead.");
+		editor.scrollIntoView({ from: cursor, to: cursor }, true);
+		return;
+	}
+
+	// FIND NEXT SUGGESTION
+	// since highlights and strikethroughs do not span lines, it is safe to
 	// start searching at the beginning of the cursor line
 	const startOfCursorlineOffset = editor.posToOffset({ line: cursor.line, ch: 0 });
 	let searchStart = startOfCursorlineOffset;
@@ -54,11 +79,19 @@ export function acceptOrRejectNextSuggestion(editor: Editor, mode: "accept" | "r
 		if (cursorOnMatch || cursorBeforeMatch) break;
 		searchStart = matchEnd;
 	}
-
 	const matchStartPos = editor.offsetToPos(matchStart);
 	const matchEndPos = editor.offsetToPos(matchEnd);
-	const updatedText = updateText(matchText, mode);
 
+	// CASE 2: if suggestion not visible, scroll to it instead
+	if (!positionVisibleOnScreen(editor, matchEndPos)) {
+		new Notice("Next suggestion is not visible. Scrolling to it instead.");
+		editor.scrollIntoView({ from: matchStartPos, to: matchEndPos }, true);
+		editor.setCursor(matchStartPos);
+		return;
+	}
+
+	// CASE 3: Cursor & suggestion visible -> update text
+	const updatedText = updateText(matchText, mode);
 	editor.replaceRange(updatedText, matchStartPos, matchEndPos);
 	editor.setCursor(matchStartPos);
 }
