@@ -50,7 +50,7 @@ async function openAiRequest(
 	}
 
 	// SEND REQUEST
-	const notice = new Notice("🤖 Sending proofread request…");
+	const notice = new Notice(`🤖 Proofreading ${scope}…`);
 	let response: RequestUrlResponse;
 	try {
 		// DOCS https://platform.openai.com/docs/api-reference/chat
@@ -113,63 +113,68 @@ async function openAiRequest(
 	const trailingWhitespace = oldText.match(/(\s*)$/)?.[0] || "";
 	newText = newText.replace(/^(\s*)/, leadingWhitespace).replace(/(\s*)$/, trailingWhitespace);
 
+	// No changes needed
+	if (newText === oldText) {
+		new Notice("✅ Text is good, nothing to change.");
+		return;
+	}
+
 	return newText;
 }
 
-export async function proofread(
-	plugin: Proofreader,
-	editor: Editor,
-	scope: "Document" | "Selection" | "Paragraph" | string, // Area of text that should be proofread
-): Promise<void> {
-	const cursor = editor.getCursor();
-	let oldText: string;
-	let bodyStart = 0;
-	let bodyEnd = 0;
-
-	if (scope === "Document") {
-		const noteWithFrontmatter = editor.getValue();
-		bodyStart = getFrontMatterInfo(noteWithFrontmatter).contentStart || 0;
-		oldText = noteWithFrontmatter.slice(bodyStart);
-		bodyEnd = noteWithFrontmatter.length;
-	} else if (editor.somethingSelected()) {
-		scope = "Selection";
-		oldText = editor.getSelection();
-	} else {
-		scope = "Paragraph";
-		oldText = editor.getLine(cursor.line);
-	}
-
-	// GUARD
+function validInputText(oldText: string, scope: string): boolean {
 	if (oldText.trim() === "") {
 		new Notice(`${scope} is empty.`);
-		return;
+		return false;
 	}
 	if (oldText.match(/==|~~/)) {
 		const warnMsg =
 			`${scope} already has highlights or strikethroughs. \n\n` +
 			"Please accept/reject the changes before making another proofreading request.";
 		new Notice(warnMsg, 6000);
-		return;
+		return false;
 	}
+	return true;
+}
 
-	// PROOFREAD
-	const newText = await openAiRequest(plugin.settings, oldText, scope);
+//──────────────────────────────────────────────────────────────────────────────
+
+export async function proofreadDocument(plugin: Proofreader, editor: Editor): Promise<void> {
+	const noteWithFrontmatter = editor.getValue();
+	const bodyStart = getFrontMatterInfo(noteWithFrontmatter).contentStart || 0;
+	const bodyEnd = noteWithFrontmatter.length;
+	const oldText = noteWithFrontmatter.slice(bodyStart);
+
+	if (!validInputText(oldText, "Document")) return;
+	const newText = await openAiRequest(plugin.settings, oldText, "Document");
 	if (!newText) return;
-	if (newText === oldText) {
-		new Notice("✅ Text is good, nothing change.");
-		return;
-	}
 	const changes = getDiffMarkdown(oldText, newText);
 
-	if (scope === "Note") {
-		const bodyStartPos = editor.offsetToPos(bodyStart);
-		const bodyEndPos = editor.offsetToPos(bodyEnd);
-		editor.replaceRange(changes, bodyStartPos, bodyEndPos);
-	} else if (scope === "Paragraph") {
-		editor.setLine(cursor.line, changes);
-	} else if (scope === "Selection") {
-		editor.replaceSelection(changes);
-	}
+	const bodyStartPos = editor.offsetToPos(bodyStart);
+	const bodyEndPos = editor.offsetToPos(bodyEnd);
+	editor.replaceRange(changes, bodyStartPos, bodyEndPos);
+	editor.setCursor(editor.offsetToPos(bodyStart)); // to start of doc
+}
 
-	editor.setCursor(cursor);
+export async function proofreadSelectionParagraph(
+	plugin: Proofreader,
+	editor: Editor,
+): Promise<void> {
+	const cursor = editor.getCursor("from"); // `from` gives start if selection
+	const selection = editor.getSelection();
+	const oldText = selection || editor.getLine(cursor.line);
+	const scope = selection ? "Selection" : "Paragraph";
+
+	if (!validInputText(oldText, scope)) return;
+	const newText = await openAiRequest(plugin.settings, oldText, scope);
+	if (!newText) return;
+	const changes = getDiffMarkdown(oldText, newText);
+
+	if (selection) {
+		editor.replaceSelection(changes);
+		editor.setCursor(cursor);  // to start of selection
+	} else {
+		editor.setLine(cursor.line, changes);
+		editor.setCursor({ line: cursor.line, ch: 0 }); // to start of paragraph
+	}
 }

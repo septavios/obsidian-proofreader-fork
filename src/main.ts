@@ -1,6 +1,6 @@
 import { Plugin } from "obsidian";
 import { acceptOrRejectInText, acceptOrRejectNextSuggestion } from "./accept-reject-suggestions";
-import { proofread } from "./proofread";
+import { proofreadDocument, proofreadSelectionParagraph } from "./proofread";
 import { DEFAULT_SETTINGS, ProofreaderSettings, ProofreaderSettingsMenu } from "./settings";
 
 // biome-ignore lint/style/noDefaultExport: required for Obsidian plugins to work
@@ -16,13 +16,13 @@ export default class Proofreader extends Plugin {
 		this.addCommand({
 			id: "proofread-selection-paragraph",
 			name: "Proofread selection/paragraph",
-			editorCallback: (editor): Promise<void> => proofread(this, editor, "Selection/Paragraph"),
+			editorCallback: (editor): Promise<void> => proofreadSelectionParagraph(this, editor),
 			icon: "bot-message-square",
 		});
 		this.addCommand({
 			id: "proofread-full-document",
 			name: "Proofread full document",
-			editorCallback: (editor): Promise<void> => proofread(this, editor, "Document"),
+			editorCallback: (editor): Promise<void> => proofreadDocument(this, editor),
 			icon: "bot-message-square",
 		});
 		this.addCommand({
