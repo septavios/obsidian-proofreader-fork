@@ -51,7 +51,7 @@ export function acceptOrRejectNextSuggestion(editor: Editor, mode: "accept" | "r
 
 	// CASE 1: if cursor not visible, scroll to it instead
 	if (!positionVisibleOnScreen(editor, cursor)) {
-		new Notice("Cursor is not visible. Scrolling to it instead.");
+		new Notice("Cursor is not visible. Scrolled to the cursor instead.");
 		editor.scrollIntoView({ from: cursor, to: cursor }, true);
 		return;
 	}
@@ -84,7 +84,7 @@ export function acceptOrRejectNextSuggestion(editor: Editor, mode: "accept" | "r
 
 	// CASE 2: if suggestion not visible, scroll to it instead
 	if (!positionVisibleOnScreen(editor, matchEndPos)) {
-		new Notice("Next suggestion is not visible. Scrolling to it instead.");
+		new Notice("Next suggestion not visible. Scrolled to next suggestion instead.");
 		editor.scrollIntoView({ from: matchStartPos, to: matchEndPos }, true);
 		editor.setCursor(matchStartPos);
 		return;
