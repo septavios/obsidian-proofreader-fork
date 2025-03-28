@@ -12,8 +12,13 @@ export async function openAiRequest(
 		return;
 	}
 
+	let msg = `🤖 ${scope} is being proofread…`;
+	if (oldText.length > 1500) msg += "\n\nDue to the length of the text, this may take a moment. ";
+	if (oldText.length > 15000)
+		msg += "(A minute or longer — there will be a notification when an error occurs.)";
+	const notice = new Notice(msg, 4000);
+
 	// SEND REQUEST
-	const notice = new Notice(`🤖 ${scope} is being proofread…`);
 	let response: RequestUrlResponse;
 	try {
 		// DOCS https://platform.openai.com/docs/api-reference/chat
