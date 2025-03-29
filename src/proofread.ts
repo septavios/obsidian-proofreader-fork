@@ -80,6 +80,12 @@ export async function proofreadDocument(plugin: Proofreader, editor: Editor): Pr
 }
 
 export async function proofreadText(plugin: Proofreader, editor: Editor): Promise<void> {
+	const hasMultipleSelections = editor.listSelections().length > 1;
+	if (hasMultipleSelections) {
+		new Notice("Multiple selections are not supported.");
+		return;
+	}
+
 	const cursor = editor.getCursor("from"); // `from` gives start if selection
 	const selection = editor.getSelection();
 	const oldText = selection || editor.getLine(cursor.line);
