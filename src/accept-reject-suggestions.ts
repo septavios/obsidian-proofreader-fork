@@ -11,10 +11,11 @@ function updateText(text: string, mode: "accept" | "reject"): string {
 function positionVisibleOnScreen(editor: Editor, pos: EditorPosition): boolean {
 	const offset = editor.posToOffset(pos);
 
-	// FIX typo-casting as `unknown` and then actual type, since CodeMirror's and
-	// Obsidian's typing are incomplete
 	const coord = editor.cm.coordsAtPos(offset);
 	if (!coord) return false; // no coord = outside viewport
+
+	// FIX typo-casting as `unknown` and then actual type, since Obsidian's
+	// typing is incomplete, see https://forum.obsidian.md/t/api-bug-editor-getscrollinfo-is-typed-incorrectly/98886
 	const view = editor.getScrollInfo() as unknown as { clientHeight: number };
 
 	const visible = coord.top < view.clientHeight && coord.top > 0;
