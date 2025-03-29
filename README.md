@@ -29,8 +29,10 @@ word processing apps.
 - Suggested changes are inserted directly into the text: Additions as
   `==highlights==` and removals as `~~strikethroughs~~`.
 - Accept or reject changes with just one hotkey.
-- Estimated costs: For 10,000 English words input text, the cost should be less
-  than $0.05. (Based on OpenAI's usage pricing in March 2025.)
+- Easy to use: No complicated plugin settings and AI parameters to configure.
+- Estimated costs: For 10,000 English words input text, the cost should be
+  around $0.05. (Based on OpenAI's usage pricing in March 2025, and only a few
+  small tests.)
 
 > [!NOTE]
 > This plugin requires an **OpenAI API key** and incurs costs at OpenAI based on
