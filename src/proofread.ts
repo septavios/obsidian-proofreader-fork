@@ -46,7 +46,7 @@ async function getChanges(
 	}
 	if (oldText.match(/==|~~/)) {
 		const warnMsg =
-			`${scope} already has highlights or strikethroughs. \n\n` +
+			`${scope} already has highlights or strikethroughs.\n\n` +
 			"Please accept/reject the changes before making another proofreading request.";
 		new Notice(warnMsg, 6000);
 		return;

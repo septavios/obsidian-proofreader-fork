@@ -1,6 +1,12 @@
 import { Notice, RequestUrlResponse, requestUrl } from "obsidian";
 import { OPENAI_MODEL, ProofreaderSettings, STATIC_PROMPT } from "./settings";
 
+function logError(obj: unknown): void {
+	const hotkey = process.platform === "darwin" ? "cmd+opt+i" : "ctrl+shift+i";
+	new Notice(`Error. Check the console for more details (${hotkey}).`);
+	console.error("[Proofreader plugin] error", obj);
+}
+
 export async function openAiRequest(
 	settings: ProofreaderSettings,
 	oldText: string,
@@ -13,10 +19,9 @@ export async function openAiRequest(
 	}
 
 	let msg = `🤖 ${scope} is being proofread…`;
-	if (oldText.length > 1500) msg += "\n\nDue to the length of the text, this may take a moment. ";
-	if (oldText.length > 15000)
-		msg += "(A minute or longer — there will be a notification when an error occurs.)";
-	const notice = new Notice(msg, 4000);
+	if (oldText.length > 1500) msg += "\n\nDue to the length of the text, this may take a moment.";
+	if (oldText.length > 15000) msg += " (A minute or longer.)";
+	const notice = new Notice(msg, 0);
 
 	// SEND REQUEST
 	let response: RequestUrlResponse;
@@ -43,8 +48,7 @@ export async function openAiRequest(
 			new Notice("OpenAI API key is not valid. Please verify the key in the plugin settings.");
 			return;
 		}
-		new Notice("Error. Check the console for more details (ctrl+shift+i / cmd+opt+i).");
-		console.error("Proofreader plugin error:", error);
+		logError(error);
 		return;
 	}
 	notice.hide();
@@ -52,8 +56,7 @@ export async function openAiRequest(
 	// GUARD
 	let newText = response.json?.choices?.[0].message.content;
 	if (!newText) {
-		new Notice("Error. Check the console for more details (ctrl+shift+i / cmd+opt+i).");
-		console.error("Proofreader plugin error:", response);
+		logError(response);
 		return;
 	}
 
