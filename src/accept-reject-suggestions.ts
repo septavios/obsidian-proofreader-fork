@@ -1,6 +1,6 @@
 import { Editor, EditorPosition, Notice } from "obsidian";
 
-function updateText(text: string, mode: "accept" | "reject"): string {
+function removeMarkup(text: string, mode: "accept" | "reject"): string {
 	return mode === "accept"
 		? text.replace(/==/g, "").replace(/~~.*?~~/g, "")
 		: text.replace(/~~/g, "").replace(/==.*?==/g, "");
@@ -35,7 +35,7 @@ export function acceptOrRejectInText(editor: Editor, mode: "accept" | "reject"):
 		return;
 	}
 
-	const updatedText = updateText(text, mode);
+	const updatedText = removeMarkup(text, mode);
 	if (selection) editor.replaceSelection(updatedText);
 	else editor.setLine(cursor.line, updatedText);
 
@@ -92,7 +92,7 @@ export function acceptOrRejectNextSuggestion(editor: Editor, mode: "accept" | "r
 	}
 
 	// CASE 3: Cursor & suggestion visible -> update text
-	const updatedText = updateText(matchText, mode);
+	const updatedText = removeMarkup(matchText, mode);
 	editor.replaceRange(updatedText, matchStartPos, matchEndPos);
 	editor.setCursor(matchStartPos);
 }
