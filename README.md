@@ -31,8 +31,12 @@ word processing apps.
 - Accept or reject changes with just one hotkey.
 - Easy to use: No complicated plugin settings and AI parameters to configure.
 - Estimated costs: For 10,000 English words input text, the cost should be
-  around $0.05. (Based on OpenAI's usage pricing in March 2025, and only a few
-  small tests.)
+  around $0.05. (Based on OpenAI's usage pricing in March 2025, and a few
+  tests.)
+- Estimated duration: nearly instant for a paragraph, up to a few minutes for
+  an 10,000 words text.
+- In comparison, a professional proofreading service costs around $400 and
+  takes 3 days.
 
 > [!NOTE]
 > This plugin requires an **OpenAI API key** and incurs costs at OpenAI based on
