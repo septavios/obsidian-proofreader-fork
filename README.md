@@ -30,13 +30,14 @@ word processing apps.
   `==highlights==` and removals as `~~strikethroughs~~`.
 - Accept or reject changes with just one hotkey.
 - Easy to use: No complicated plugin settings and AI parameters to configure.
-- Estimated costs: For 10,000 English words input text, the cost should be
-  around $0.05. (Based on OpenAI's usage pricing in March 2025, and a few
-  tests.)
-- Estimated duration: nearly instant for a paragraph, up to a few minutes for
-  an 10,000 words text.
-- In comparison, a professional proofreading service costs around $400 and
-  takes 3 days.
+
+|                                       | Professional proofreading service               | Proofreader plugin                                                           |
+| ----------------------------------    | ----------------------------------------------- | ---------------------------------------------------------------------------- |
+| Cost for English text of 10,000 words | ~ $400, depending on the service                | ~ $0.05 (OpenAI pricing in March 2025)                                       |
+| Completion duration                   | up to 3 work days                               | about 5 minutes                                                              |
+| Input format                          | usually Microsoft Word (`.docx`)                | Markdown file in Obsidian                                                    |
+| Method of incorporating changes       | mostly mouse clicks                             | keyboard shortcuts                                                           |
+| Additional benefits                   | Editor makes general comments on writing style. | Plugin can also be used to quickly proofread single sentences or paragraphs. |
 
 > [!NOTE]
 > This plugin requires an **OpenAI API key** and incurs costs at OpenAI based on
