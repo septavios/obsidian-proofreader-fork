@@ -1,5 +1,5 @@
 import { Notice, RequestUrlResponse, requestUrl } from "obsidian";
-import { OPENAI_MODEL, ProofreaderSettings, STATIC_PROMPT } from "./settings";
+import { OPENAI_MODEL, ProofreaderSettings } from "./settings";
 
 function logError(obj: unknown): void {
 	const hotkey = process.platform === "darwin" ? "cmd+opt+i" : "ctrl+shift+i";
@@ -36,7 +36,7 @@ export async function openAiRequest(
 			body: JSON.stringify({
 				model: OPENAI_MODEL.name,
 				messages: [
-					{ role: "developer", content: STATIC_PROMPT },
+					{ role: "developer", content: settings.staticPrompt },
 					{ role: "user", content: oldText },
 				],
 			}),

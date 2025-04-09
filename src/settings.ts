@@ -11,18 +11,12 @@ export const OPENAI_MODEL = {
 	maxOutputTokens: 16_384,
 };
 
-export const STATIC_PROMPT = `
-Please make suggestions how to improve
-readability, grammar, and language of the following text. Do not change anything
-about the content, and refrain from doing any changes when the writing is
-already sufficiently clear and concise. Try to make as little changes as
-possible. Output only the changed text and nothing else. The text is: 
-`.replaceAll("\n", " ");
-
 //──────────────────────────────────────────────────────────────────────────────
 
 export const DEFAULT_SETTINGS = {
 	openAiApiKey: "",
+	staticPrompt:
+		"Please make suggestions how to improve readability, grammar, and language of the following text. Do not change anything about the content, and refrain from doing any changes when the writing is already sufficiently clear and concise. Try to make as little changes as possible. Output only the changed text and nothing else. The text is: ",
 };
 
 export type ProofreaderSettings = typeof DEFAULT_SETTINGS;
@@ -44,7 +38,6 @@ export class ProofreaderSettingsMenu extends PluginSettingTab {
 
 		containerEl.empty();
 
-		// GENERAL
 		new Setting(containerEl).setName("OpenAI API Key").addText((input) => {
 			input.inputEl.type = "password"; // obfuscates the field
 			input.inputEl.setCssProps({ width: "100%" });
@@ -52,9 +45,26 @@ export class ProofreaderSettingsMenu extends PluginSettingTab {
 				.setPlaceholder("sk-123456789…")
 				.setValue(settings.openAiApiKey)
 				.onChange(async (value) => {
-					settings.openAiApiKey = value;
+					settings.openAiApiKey = value.trim();
 					await this.plugin.saveSettings();
 				});
 		});
+
+		new Setting(containerEl)
+			.setName("Prompt")
+			.setDesc(
+				"The prompt needs to result in the AI answering only with the updated text, otherwise this plugin does not work. " +
+					"Most users do not need to change this setting; only change it if you know what you are doing.",
+			)
+			.addTextArea((textarea) => {
+				textarea.inputEl.setCssProps({ width: "25vw", height: "15em" });
+				textarea
+					.setValue(settings.staticPrompt)
+					.setPlaceholder("Make suggestions based on…")
+					.onChange(async (value) => {
+						settings.staticPrompt = value.trim();
+						await this.plugin.saveSettings();
+					});
+			});
 	}
 }
