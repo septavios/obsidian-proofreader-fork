@@ -41,7 +41,8 @@ word processing apps.
 
 [^1]: Estimated pricing for the [`gpt-4o-mini`
 	model](https://platform.openai.com/docs/models/gpt-4o-mini) in April 2025.
-	The plugin developer is not responsible if the actual costs differ.
+	The plugin developer is not responsible if the actual costs differ. You can
+	track your usage costs [on this page](https://platform.openai.com/usage).
 
 > [!NOTE]
 > This plugin requires an **OpenAI API key** and incurs costs at OpenAI based on
@@ -50,6 +51,7 @@ word processing apps.
 ## Installation & setup
 <!-- PENDING admission in plugin store -->
 <!-- ➡️ [Install in Obsidian](https://obsidian.md/plugins?id=proofreader) -->
+
 ### Plugin installation
 1. Download the [latest release](https://github.com/chrisgrieser/obsidian-proofreader/releases/latest/download/obsidian-proofreader.zip).
 2. Open Obsidian, go to `Settings → Community plugins`, click the folder icon.
@@ -67,7 +69,7 @@ Furthermore, the plugin requires an OpenAI API key.
 2. Go to [this site](https://platform.openai.com/api-keys), and click `Create
    new secret key`.
 3. Copy the API key.
-4. Go to Obsidian `Settings → Proofreader` and paste your API key there.
+4. In Obsidian, go to `Settings → Proofreader` and paste your API key there.
 
 ## Usage
 1. Use the command `Proofread selection/paragraph` to check the selected
@@ -77,8 +79,8 @@ Furthermore, the plugin requires an OpenAI API key.
 2. The changes are automatically inserted.
 3. Accept/reject changes with the `Accept suggestions in selection/paragraph`.
    Same as the proofreading command, the `accept` and `reject` commands affect
-   the current paragraph, if there is no selection. Alternatively, you can also
-   just accept/reject the next suggestion after your cursor via `Accept next
+   the current paragraph if there is no selection. Alternatively, you can also
+   only accept/reject the next suggestion after your cursor via `Accept next
    suggestion`.
 
 > [!TIP]
