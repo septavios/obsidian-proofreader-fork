@@ -11,7 +11,7 @@ export async function openAiRequest(
 	settings: ProofreaderSettings,
 	oldText: string,
 	scope: string,
-): Promise<{ newText: string; overlength: boolean } | undefined> {
+): Promise<{ newText: string; overlength: boolean; cost: number } | undefined> {
 	// GUARD
 	if (!settings.openAiApiKey) {
 		new Notice("Please set your OpenAI API key in the plugin settings.");
@@ -62,7 +62,7 @@ export async function openAiRequest(
 
 	// Ensure same amount of surrounding whitespace
 	// (A selection can have surrounding whitespace, but the AI response usually
-	// removes those. This results the text effectively being trimmed.)
+	// removes those. This results in the text effectively being trimmed.)
 	const leadingWhitespace = oldText.match(/^(\s*)/)?.[0] || "";
 	const trailingWhitespace = oldText.match(/(\s*)$/)?.[0] || "";
 	newText = newText.replace(/^(\s*)/, leadingWhitespace).replace(/(\s*)$/, trailingWhitespace);
@@ -78,5 +78,11 @@ export async function openAiRequest(
 		new Notice(msg, 10_000);
 	}
 
-	return { newText: newText, overlength: overlength };
+	// inform about cost
+	const inputTokensUsed = response.json?.usage?.prompt_tokens || 0;
+	const cost =
+		(inputTokensUsed * OPENAI_MODEL.costPerMillionToken.input) / 1e6 +
+		(outputTokensUsed * OPENAI_MODEL.costPerMillionToken.output) / 1e6;
+
+	return { newText: newText, overlength: overlength, cost: cost };
 }

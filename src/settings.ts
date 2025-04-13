@@ -9,6 +9,7 @@ import Proofreader from "./main";
 export const OPENAI_MODEL = {
 	name: "gpt-4o-mini",
 	maxOutputTokens: 16_384,
+	costPerMillionToken: { input: 0.15, output: 0.6 },
 };
 
 //──────────────────────────────────────────────────────────────────────────────

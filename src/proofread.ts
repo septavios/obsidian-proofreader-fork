@@ -4,7 +4,11 @@ import Proofreader from "./main";
 import { openAiRequest } from "./openai-request";
 
 // DOCS https://github.com/kpdecker/jsdiff#readme
-function getDiffMarkdown(oldText: string, newText: string, overlength?: boolean): string {
+function getDiffMarkdown(
+	oldText: string,
+	newText: string,
+	overlength?: boolean,
+): { textWithSuggestions: string; changeCount: number } {
 	const diff = diffWords(oldText, newText);
 
 	// do not remove text after cutoff-length
@@ -26,16 +30,12 @@ function getDiffMarkdown(oldText: string, newText: string, overlength?: boolean)
 			return part.value;
 		})
 		.join("");
-
-	// notification
 	const changeCount = diff.filter((part) => part.added || part.removed).length;
-	const pluralS = changeCount === 1 ? "" : "s";
-	if (changeCount > 0) new Notice(`🤖 ${changeCount} change${pluralS} made.`);
 
-	return textWithSuggestions;
+	return { textWithSuggestions: textWithSuggestions, changeCount: changeCount };
 }
 
-async function getChanges(
+async function validateGetChangesAndNotify(
 	plugin: Proofreader,
 	oldText: string,
 	scope: string,
@@ -51,7 +51,8 @@ async function getChanges(
 		new Notice(warnMsg, 6000);
 		return;
 	}
-	const { newText, overlength } = (await openAiRequest(plugin.settings, oldText, scope)) || {};
+	const { newText, overlength, cost } =
+		(await openAiRequest(plugin.settings, oldText, scope)) || {};
 	if (!newText) return;
 
 	if (newText === oldText) {
@@ -59,7 +60,24 @@ async function getChanges(
 		return;
 	}
 
-	return getDiffMarkdown(oldText, newText, overlength);
+	const { textWithSuggestions, changeCount } = getDiffMarkdown(oldText, newText, overlength);
+
+	// notify
+	const pluralS = changeCount === 1 ? "" : "s";
+	const msg = [
+		`🤖 ${changeCount} change${pluralS} made.`,
+		"",
+		`est. cost: $${cost?.toFixed(5)}`,
+	].join("\n");
+
+	// Proofreading a document likely takes longer, we want to keep the finishing
+	// message in case the user goes afk. (In the Notice API, duration 0 means
+	// keeping the notice until the user dismisses it.)
+	const duration = scope === "Document" ? 0 : 5_000;
+
+	new Notice(msg, duration);
+
+	return textWithSuggestions;
 }
 
 //──────────────────────────────────────────────────────────────────────────────
@@ -70,7 +88,7 @@ export async function proofreadDocument(plugin: Proofreader, editor: Editor): Pr
 	const bodyEnd = noteWithFrontmatter.length;
 	const oldText = noteWithFrontmatter.slice(bodyStart);
 
-	const changes = await getChanges(plugin, oldText, "Document");
+	const changes = await validateGetChangesAndNotify(plugin, oldText, "Document");
 	if (!changes) return;
 
 	const bodyStartPos = editor.offsetToPos(bodyStart);
@@ -91,7 +109,7 @@ export async function proofreadText(plugin: Proofreader, editor: Editor): Promis
 	const oldText = selection || editor.getLine(cursor.line);
 	const scope = selection ? "Selection" : "Paragraph";
 
-	const changes = await getChanges(plugin, oldText, scope);
+	const changes = await validateGetChangesAndNotify(plugin, oldText, scope);
 	if (!changes) return;
 
 	if (selection) {
