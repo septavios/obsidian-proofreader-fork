@@ -33,16 +33,16 @@ word processing apps.
 
 |                                       | Professional proofreading service               | Proofreader plugin                                                           |
 | ----------------------------------    | ----------------------------------------------- | ---------------------------------------------------------------------------- |
-| Cost for English text of 10,000 words | ~ $400, depending on the service                | ~ $0.05 [^1]                                                                 |
+| Cost for English text of 10,000 words | ~ $400, depending on the service                | ~ \$0.01 – $0.06[^1]                                                         |
 | Completion duration                   | up to 3 work days                               | about 5 minutes                                                              |
 | Input format                          | usually Microsoft Word (`.docx`)                | Markdown file in Obsidian                                                    |
 | Method of incorporating changes       | mostly mouse clicks                             | keyboard shortcuts                                                           |
 | Additional benefits                   | Editor makes general comments on writing style. | Plugin can also be used to quickly proofread single sentences or paragraphs. |
 
-[^1]: Estimated pricing for the [`gpt-4o-mini`
-	model](https://platform.openai.com/docs/models/gpt-4o-mini) in April 2025.
-	The plugin developer is not responsible if the actual costs differ. You can
-	track your usage costs [on this page](https://platform.openai.com/usage).
+[^1]: Estimated pricing for the [recent mini and nano
+	models](https://platform.openai.com/docs/models/) in April 2025. The plugin
+	developer is not responsible if the actual costs differ. You can track your
+	usage costs [on this page](https://platform.openai.com/usage).
 
 > [!NOTE]
 > This plugin requires an **OpenAI API key** and incurs costs at OpenAI based on

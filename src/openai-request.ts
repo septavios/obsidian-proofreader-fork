@@ -1,5 +1,5 @@
 import { Notice, RequestUrlResponse, requestUrl } from "obsidian";
-import { OPENAI_MODEL, ProofreaderSettings } from "./settings";
+import { MODEL_SPECS, ProofreaderSettings } from "./settings";
 
 function logError(obj: unknown): void {
 	const hotkey = process.platform === "darwin" ? "cmd+opt+i" : "ctrl+shift+i";
@@ -34,7 +34,7 @@ export async function openAiRequest(
 			// biome-ignore lint/style/useNamingConvention: not by me
 			headers: { Authorization: "Bearer " + settings.openAiApiKey },
 			body: JSON.stringify({
-				model: OPENAI_MODEL.name,
+				model: settings.openAiModel,
 				messages: [
 					{ role: "developer", content: settings.staticPrompt },
 					{ role: "user", content: oldText },
@@ -69,8 +69,9 @@ export async function openAiRequest(
 
 	// determine if overlength
 	// https://platform.openai.com/docs/guides/conversation-state?api-mode=responses#managing-context-for-text-generation
+	const modelSpec = MODEL_SPECS[settings.openAiModel];
 	const outputTokensUsed = response.json?.usage?.completion_tokens || 0;
-	const overlength = outputTokensUsed >= OPENAI_MODEL.maxOutputTokens;
+	const overlength = outputTokensUsed >= modelSpec.maxOutputTokens;
 	if (overlength) {
 		const msg =
 			"Text is longer than the maximum output supported by the AI model.\n\n" +
@@ -81,8 +82,8 @@ export async function openAiRequest(
 	// inform about cost
 	const inputTokensUsed = response.json?.usage?.prompt_tokens || 0;
 	const cost =
-		(inputTokensUsed * OPENAI_MODEL.costPerMillionToken.input) / 1e6 +
-		(outputTokensUsed * OPENAI_MODEL.costPerMillionToken.output) / 1e6;
+		(inputTokensUsed * modelSpec.costPerMillionTokens.input) / 1e6 +
+		(outputTokensUsed * modelSpec.costPerMillionTokens.output) / 1e6;
 
 	return { newText: newText, overlength: overlength, cost: cost };
 }
