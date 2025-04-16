@@ -39,7 +39,7 @@ word processing apps.
 | Method of incorporating changes       | mostly mouse clicks                             | keyboard shortcuts                                                           |
 | Additional benefits                   | Editor makes general comments on writing style. | Plugin can also be used to quickly proofread single sentences or paragraphs. |
 
-[^1]: Estimated pricing for the [recent mini and nano
+[^1]: Estimated pricing for the [GPT 4.1 mini and nano
 	models](https://platform.openai.com/docs/models/) in April 2025. The plugin
 	developer is not responsible if the actual costs differ. You can track your
 	usage costs [on this page](https://platform.openai.com/usage).

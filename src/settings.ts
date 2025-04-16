@@ -1,7 +1,9 @@
 import { PluginSettingTab, Setting } from "obsidian";
 import Proofreader from "./main";
 
-// DOCS https://platform.openai.com/docs/models/gpt-4o-mini
+// DOCS
+// https://platform.openai.com/docs/models/gpt-4.1-mini
+// https://platform.openai.com/docs/models/gpt-4.1-nano
 // The `nano` and `mini` models are sufficiently good sufficiently good output.
 export const MODEL_SPECS = {
 	"gpt-4.1-nano": {
@@ -16,13 +18,6 @@ export const MODEL_SPECS = {
 		maxOutputTokens: 32_768,
 		costPerMillionTokens: { input: 0.4, output: 1.6 },
 		intelligence: 3,
-		speed: 4,
-	},
-	"gpt-4o-mini": {
-		displayText: "GPT 4o mini",
-		maxOutputTokens: 16_384,
-		costPerMillionTokens: { input: 0.15, output: 0.6 },
-		intelligence: 2,
 		speed: 4,
 	},
 };
@@ -72,8 +67,8 @@ export class ProofreaderSettingsMenu extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName("Model")
 			.setDesc(
-				"4.1 nano is slightly quicker and cheaper, 4.1 mini is slightly higher quality, but also the most expensive. " +
-					"4o mini is less recent and thus better tested, but otherwise slightly slower, and slightly lower quality.",
+				"The nano model is slightly quicker and cheaper." +
+					" The mini model is slightly higher quality, but also more expensive. ",
 			)
 			.addDropdown((dropdown) => {
 				for (const key in MODEL_SPECS) {
