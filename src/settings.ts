@@ -1,24 +1,28 @@
 import { PluginSettingTab, Setting } from "obsidian";
 import Proofreader from "./main";
 
-// DOCS
-// https://platform.openai.com/docs/models/gpt-4.1-mini
-// https://platform.openai.com/docs/models/gpt-4.1-nano
-// The `nano` and `mini` models are sufficiently good sufficiently good output.
+// The `nano` and `mini` models are sufficiently good sufficiently good output
+// for the very focussed task of just fixing language
 export const MODEL_SPECS = {
 	"gpt-4.1-nano": {
-		displayText: "GPT 4.1 nano (recommended)",
+		displayText: "GPT 4.1 nano",
 		maxOutputTokens: 32_768,
 		costPerMillionTokens: { input: 0.1, output: 0.4 },
-		intelligence: 2,
-		speed: 5,
+		info: {
+			intelligence: 2,
+			speed: 5,
+			url: "https://platform.openai.com/docs/models/gpt-4.1-nano",
+		},
 	},
 	"gpt-4.1-mini": {
 		displayText: "GPT 4.1 mini",
 		maxOutputTokens: 32_768,
 		costPerMillionTokens: { input: 0.4, output: 1.6 },
-		intelligence: 3,
-		speed: 4,
+		info: {
+			intelligence: 3,
+			speed: 4,
+			url: "https://platform.openai.com/docs/models/gpt-4.1-mini",
+		},
 	},
 };
 
@@ -28,9 +32,9 @@ type OpenAiModels = keyof typeof MODEL_SPECS;
 
 export const DEFAULT_SETTINGS = {
 	openAiApiKey: "",
+	openAiModel: "gpt-4.1-nano" as OpenAiModels,
 	staticPrompt:
 		"Please make suggestions how to improve readability, grammar, and language of the following text. Do not change anything about the content, and refrain from doing any changes when the writing is already sufficiently clear and concise. Try to make as little changes as possible. Output only the changed text and nothing else. The text is: ",
-	openAiModel: "gpt-4.1-nano" as OpenAiModels,
 };
 
 export type ProofreaderSettings = typeof DEFAULT_SETTINGS;
