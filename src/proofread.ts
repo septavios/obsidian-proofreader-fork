@@ -35,7 +35,7 @@ function getDiffMarkdown(
 	return { textWithSuggestions: textWithSuggestions, changeCount: changeCount };
 }
 
-async function validateGetChangesAndNotify(
+async function validateAndGetChangesAndNotify(
 	plugin: Proofreader,
 	oldText: string,
 	scope: string,
@@ -88,7 +88,7 @@ export async function proofreadDocument(plugin: Proofreader, editor: Editor): Pr
 	const bodyEnd = noteWithFrontmatter.length;
 	const oldText = noteWithFrontmatter.slice(bodyStart);
 
-	const changes = await validateGetChangesAndNotify(plugin, oldText, "Document");
+	const changes = await validateAndGetChangesAndNotify(plugin, oldText, "Document");
 	if (!changes) return;
 
 	const bodyStartPos = editor.offsetToPos(bodyStart);
@@ -109,7 +109,7 @@ export async function proofreadText(plugin: Proofreader, editor: Editor): Promis
 	const oldText = selection || editor.getLine(cursor.line);
 	const scope = selection ? "Selection" : "Paragraph";
 
-	const changes = await validateGetChangesAndNotify(plugin, oldText, scope);
+	const changes = await validateAndGetChangesAndNotify(plugin, oldText, scope);
 	if (!changes) return;
 
 	if (selection) {
