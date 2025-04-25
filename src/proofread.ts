@@ -25,9 +25,9 @@ function getDiffMarkdown(
 	// diff objects to ==highlights== and ~~strikethrough~~
 	const textWithSuggestions = diff
 		.map((part) => {
-			if (part.added) return `==${part.value}==`;
-			if (part.removed) return `~~${part.value}~~`;
-			return part.value;
+			if (!part.added && !part.removed) return part.value;
+			const value = part.added ? `==${part.value}==` : `~~${part.value}~~`;
+			return value.replace(/^(==|~~) /, " $1"); // prevent leading spaces in markup, which makes it invalid
 		})
 		.join("");
 	const changeCount = diff.filter((part) => part.added || part.removed).length;
