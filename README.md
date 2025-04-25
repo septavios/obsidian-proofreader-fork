@@ -1,12 +1,11 @@
 # Proofreader
-<!-- PENDING admission in plugin store -->
-<!-- ![Obsidian Downloads](https://img.shields.io/badge/dynamic/json?logo=obsidian&color=%23483699&label=downloads&query=%24%5B%22proofreader%22%5D.downloads&url=https%3A%2F%2Fraw.githubusercontent.com%2Fobsidianmd%2Fobsidian-releases%2Fmaster%2Fcommunity-plugin-stats.json&style=plastic)-->
+![Obsidian downloads](https://img.shields.io/badge/dynamic/json?logo=obsidian&color=%23483699&label=downloads&query=%24%5B%22proofreader%22%5D.downloads&url=https%3A%2F%2Fraw.githubusercontent.com%2Fobsidianmd%2Fobsidian-releases%2Fmaster%2Fcommunity-plugin-stats.json&style=plastic)
 ![GitHub download count](https://img.shields.io/github/downloads/chrisgrieser/obsidian-proofreader/total?label=GitHub%20Downloads&style=plastic)
 ![Last release](https://img.shields.io/github/v/release/chrisgrieser/obsidian-proofreader?label=Latest%20Release&style=plastic)
 
 AI-based proofreading and stylistic improvements for your writing. Changes are
-inserted as suggestions directly in the editor, similar to suggested changes in
-word processing apps.
+inserted as suggestions directly in the editor, similar to the suggested changes
+feature in word processing apps.
 
 <img alt="Showcase" width=70% src="https://github.com/user-attachments/assets/fa77eb97-61b9-4102-b8b2-e7c385868363">
 
@@ -49,22 +48,11 @@ word processing apps.
 > usage. Network requests are made when running the proofreading command.
 
 ## Installation & setup
-<!-- PENDING admission in plugin store -->
-<!-- ➡️ [Install in Obsidian](https://obsidian.md/plugins?id=proofreader) -->
 
 ### Plugin installation
-1. Download the [latest release](https://github.com/chrisgrieser/obsidian-proofreader/releases/latest/download/obsidian-proofreader.zip).
-2. Open Obsidian, go to `Settings → Community plugins`, click the folder icon.
-3. In the folder that opens, create a new folder called `proofreader`.
-4. Unzip the downloaded release file and move all files into the folder
-   `obsidian`.
-5. Go back to Obsidian, `Settings → Community plugins`, and click the refresh
-   icon.
-6. `Proofreader` will now appear in your list of plugins. Enable it by checking
-   the box.
+[Install in Obsidian](https://obsidian.md/plugins?id=proofreader)
 
 ### Get an OpenAI API key
-Furthermore, the plugin requires an OpenAI API key.
 1. [Create an OpenAI account](https://auth.openai.com/create-account).
 2. Go to [this site](https://platform.openai.com/api-keys), and click `Create
    new secret key`.
