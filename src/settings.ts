@@ -83,7 +83,7 @@ export class ProofreaderSettingsMenu extends PluginSettingTab {
 			.setDesc(
 				"The nano model is slightly quicker and cheaper. " +
 					"The mini model is slightly higher quality, but also more expensive. " +
-					"Other models are both slower and more expensive and should only be selected " +
+					"Other models are both slower and more expensive; they should only be selected " +
 					"if you intend to use this plugin for tasks other than proofreading.",
 			)
 			.addDropdown((dropdown) => {
@@ -114,6 +114,7 @@ export class ProofreaderSettingsMenu extends PluginSettingTab {
 					.setValue(settings.staticPrompt)
 					.setPlaceholder("Make suggestions based on…")
 					.onChange(async (value) => {
+						if (value.trim() === "") return;
 						settings.staticPrompt = value.trim();
 						await this.plugin.saveSettings();
 					});
