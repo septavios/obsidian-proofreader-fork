@@ -5,7 +5,7 @@ import Proofreader from "./main";
 // for the very focussed task of just fixing language
 export const MODEL_SPECS = {
 	"gpt-4.1-nano": {
-		displayText: "GPT 4.1 nano",
+		displayText: "GPT 4.1 nano (recommended)",
 		maxOutputTokens: 32_768,
 		costPerMillionTokens: { input: 0.1, output: 0.4 },
 		info: {
@@ -15,13 +15,23 @@ export const MODEL_SPECS = {
 		},
 	},
 	"gpt-4.1-mini": {
-		displayText: "GPT 4.1 mini",
+		displayText: "GPT 4.1 mini (recommended)",
 		maxOutputTokens: 32_768,
 		costPerMillionTokens: { input: 0.4, output: 1.6 },
 		info: {
 			intelligence: 3,
 			speed: 4,
 			url: "https://platform.openai.com/docs/models/gpt-4.1-mini",
+		},
+	},
+	"gpt-4.1": {
+		displayText: "GPT 4.1 (for tasks beyond proofreading)",
+		maxOutputTokens: 32_768,
+		costPerMillionTokens: { input: 2.0, output: 8.0 },
+		info: {
+			intelligence: 4,
+			speed: 3,
+			url: "https://platform.openai.com/docs/models/gpt-4.1",
 		},
 	},
 };
@@ -71,8 +81,10 @@ export class ProofreaderSettingsMenu extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName("Model")
 			.setDesc(
-				"The nano model is slightly quicker and cheaper." +
-					" The mini model is slightly higher quality, but also more expensive. ",
+				"The nano model is slightly quicker and cheaper. " +
+					"The mini model is slightly higher quality, but also more expensive. " +
+					"Other models are both slower and more expensive and should only be selected " +
+					"if you intend to use this plugin for tasks other than proofreading.",
 			)
 			.addDropdown((dropdown) => {
 				for (const key in MODEL_SPECS) {
@@ -93,8 +105,8 @@ export class ProofreaderSettingsMenu extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName("Prompt")
 			.setDesc(
-				"The prompt needs to result in the AI answering only with the updated text, otherwise this plugin does not work. " +
-					"Most users do not need to change this setting; only change it if you know what you are doing.",
+				"The prompt needs to result in the AI answering ONLY with the updated text, otherwise this plugin will not work. " +
+					"Most users do not need to change this setting; only change this if you know what you are doing.",
 			)
 			.addTextArea((textarea) => {
 				textarea.inputEl.setCssProps({ width: "25vw", height: "15em" });
