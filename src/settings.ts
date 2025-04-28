@@ -44,7 +44,7 @@ export const DEFAULT_SETTINGS = {
 	openAiApiKey: "",
 	openAiModel: "gpt-4.1-nano" as OpenAiModels,
 	staticPrompt:
-		"Please make suggestions how to improve readability, grammar, and language of the following text. Do not change anything about the content, and refrain from doing any changes when the writing is already sufficiently clear and concise. Try to make as little changes as possible. Output only the changed text and nothing else. The text is: ",
+		"Act as a professional editor. Please make suggestions how to improve clarity, readability, grammar, and language of the following text. Preserve the original meaning and any technical jargon. Do not change anything about the original meaning. Suggest structural changes only if they significantly improve flow or understanding—avoid unnecessary expansion or major reformatting (e.g., no unwarranted lists). Try to make as little changes as possible, refrain from doing any changes when the writing is already sufficiently clear and concise. Output only the revised text and nothing else. The text is: ",
 };
 
 export type ProofreaderSettings = typeof DEFAULT_SETTINGS;
