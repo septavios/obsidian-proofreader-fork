@@ -90,6 +90,13 @@ add CSS snippets.](https://help.obsidian.md/snippets))
 }
 ```
 
+## Testimonials
+
+> I was paying $29 a month for type.ai until today, your plugin made me cancel
+> the subscription, because the only feature I wanted from there was this inline
+> granular diffing which no other app offered, until Proofreader.
+> [@samwega](https://github.com/chrisgrieser/obsidian-proofreader/discussions/1#discussioncomment-12972780)
+
 ## Plugin development
 
 ```bash
