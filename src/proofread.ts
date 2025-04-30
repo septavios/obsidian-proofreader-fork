@@ -27,10 +27,13 @@ function getDiffMarkdown(
 		.map((part) => {
 			if (!part.added && !part.removed) return part.value;
 			const value = part.added ? `==${part.value}==` : `~~${part.value}~~`;
-			return value.replace(/^(==|~~) /, " $1"); // prevent leading spaces in markup, which makes it invalid
+			const fixedValue = value.replace(/^(==|~~) /, " $1"); // prevent leading spaces in markup, which makes it invalid
+			return fixedValue;
 		})
-		.join("");
-	const changeCount = diff.filter((part) => part.added || part.removed).length;
+		.join("")
+		.replace(/~~"~~==[“”]==/, '"') // preserve non-smart quotes
+		.replace(/~~'~~==[‘’]==/, "'");
+	const changeCount = (textWithSuggestions.match(/==|~~/g)?.length || 0) / 2;
 
 	return { textWithSuggestions: textWithSuggestions, changeCount: changeCount };
 }
