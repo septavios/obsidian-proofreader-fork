@@ -43,6 +43,7 @@ async function validateAndGetChangesAndNotify(
 	oldText: string,
 	scope: string,
 ): Promise<string | undefined> {
+	// GUARD valid start-text
 	if (oldText.trim() === "") {
 		new Notice(`${scope} is empty.`);
 		return;
@@ -54,31 +55,37 @@ async function validateAndGetChangesAndNotify(
 		new Notice(warnMsg, 6000);
 		return;
 	}
-	const { newText, overlength, cost } =
-		(await openAiRequest(plugin.settings, oldText, scope)) || {};
+
+	// notify on start
+	let msg = `🤖 ${scope} is being proofread…`;
+	if (oldText.length > 1500) msg += "\n\nDue to the length of the text, this may take a moment.";
+	if (oldText.length > 15000) msg += " (A minute or longer.)";
+	const notice = new Notice(msg, 0);
+
+	// perform request, check that file is still the same
+	const { newText, overlength, cost } = (await openAiRequest(plugin.settings, oldText)) || {};
+	notice.hide();
 	if (!newText) return;
 
+	// check if diff is even needed
 	if (newText === oldText) {
 		new Notice("✅ Text is good, nothing to change.");
 		return;
 	}
-
 	const { textWithSuggestions, changeCount } = getDiffMarkdown(oldText, newText, overlength);
 
-	// notify
+	// notify on changes
 	const pluralS = changeCount === 1 ? "" : "s";
-	const msg = [
+	const msg2 = [
 		`🤖 ${changeCount} change${pluralS} made.`,
 		"",
 		`est. cost: $${cost?.toFixed(5)}`,
 	].join("\n");
-
 	// Proofreading a document likely takes longer, we want to keep the finishing
-	// message in case the user goes afk. (In the Notice API, duration 0 means
+	// message in case the user went afk. (In the Notice API, duration 0 means
 	// keeping the notice until the user dismisses it.)
 	const duration = scope === "Document" ? 0 : 5_000;
-
-	new Notice(msg, duration);
+	new Notice(msg2, duration);
 
 	return textWithSuggestions;
 }

@@ -16,18 +16,12 @@ function logError(obj: unknown): void {
 export async function openAiRequest(
 	settings: ProofreaderSettings,
 	oldText: string,
-	scope: string,
 ): Promise<{ newText: string; overlength: boolean; cost: number } | undefined> {
 	// GUARD
 	if (!settings.openAiApiKey) {
 		new Notice("Please set your OpenAI API key in the plugin settings.");
 		return;
 	}
-
-	let msg = `🤖 ${scope} is being proofread…`;
-	if (oldText.length > 1500) msg += "\n\nDue to the length of the text, this may take a moment.";
-	if (oldText.length > 15000) msg += " (A minute or longer.)";
-	const notice = new Notice(msg, 0);
 
 	// SEND REQUEST
 	let response: RequestUrlResponse;
@@ -49,7 +43,6 @@ export async function openAiRequest(
 		});
 		console.debug("[Proofreader plugin] OpenAI response", response);
 	} catch (error) {
-		notice.hide();
 		if ((error as { status: number }).status === 401) {
 			new Notice("OpenAI API key is not valid. Please verify the key in the plugin settings.");
 			return;
@@ -57,7 +50,6 @@ export async function openAiRequest(
 		logError(error);
 		return;
 	}
-	notice.hide();
 
 	// GUARD
 	let newText = response.json?.choices?.[0].message.content;
