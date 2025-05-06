@@ -58,14 +58,23 @@ async function validateAndGetChangesAndNotify(
 
 	// notify on start
 	let msg = `🤖 ${scope} is being proofread…`;
-	if (oldText.length > 1500) msg += "\n\nDue to the length of the text, this may take a moment.";
-	if (oldText.length > 15000) msg += " (A minute or longer.)";
+	if (oldText.length > 1500) {
+		msg += "\n\nDue to the length of the text, this may take a moment.";
+		if (oldText.length > 15000) msg += " (A minute or longer.)";
+		msg += "\n\nDo not go to a different file or change the original text in the meantime.";
+	}
 	const notice = new Notice(msg, 0);
 
 	// perform request, check that file is still the same
+	const fileBefore = plugin.app.workspace.getActiveFile()?.path;
 	const { newText, overlength, cost } = (await openAiRequest(plugin.settings, oldText)) || {};
 	notice.hide();
 	if (!newText) return;
+	const fileAfter = plugin.app.workspace.getActiveFile()?.path;
+	if (fileBefore !== fileAfter) {
+		new Notice("⚠️ The active file changed since the proofread has been triggered. Aborting.");
+		return;
+	}
 
 	// check if diff is even needed
 	if (newText === oldText) {
