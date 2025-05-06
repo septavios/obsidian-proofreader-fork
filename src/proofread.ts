@@ -56,29 +56,38 @@ async function validateAndGetChangesAndNotify(
 		return;
 	}
 
+	// parameters
+	const fileBefore = plugin.app.workspace.getActiveFile()?.path;
+	const longInput = oldText.length > 1500;
+	const veryLongInput = oldText.length > 15000;
+	// Proofreading a document likely takes longer, we want to keep the finishing
+	// message in case the user went afk. (In the Notice API, duration 0 means
+	// keeping the notice until the user dismisses it.)
+	const notifDuration = longInput ? 0 : 4_000;
+
 	// notify on start
 	let msg = `🤖 ${scope} is being proofread…`;
-	if (oldText.length > 1500) {
+	if (longInput) {
 		msg += "\n\nDue to the length of the text, this may take a moment.";
-		if (oldText.length > 15000) msg += " (A minute or longer.)";
+		if (veryLongInput) msg += " (A minute or longer.)";
 		msg += "\n\nDo not go to a different file or change the original text in the meantime.";
 	}
 	const notice = new Notice(msg, 0);
 
 	// perform request, check that file is still the same
-	const fileBefore = plugin.app.workspace.getActiveFile()?.path;
 	const { newText, overlength, cost } = (await openAiRequest(plugin.settings, oldText)) || {};
 	notice.hide();
 	if (!newText) return;
 	const fileAfter = plugin.app.workspace.getActiveFile()?.path;
 	if (fileBefore !== fileAfter) {
-		new Notice("⚠️ The active file changed since the proofread has been triggered. Aborting.");
+		const errmsg = "⚠️ The active file changed since the proofread has been triggered. Aborting.";
+		new Notice(errmsg, notifDuration);
 		return;
 	}
 
 	// check if diff is even needed
 	if (newText === oldText) {
-		new Notice("✅ Text is good, nothing to change.");
+		new Notice("✅ Text is good, nothing to change.", notifDuration);
 		return;
 	}
 	const { textWithSuggestions, changeCount } = getDiffMarkdown(oldText, newText, overlength);
@@ -90,11 +99,7 @@ async function validateAndGetChangesAndNotify(
 		"",
 		`est. cost: $${cost?.toFixed(5)}`,
 	].join("\n");
-	// Proofreading a document likely takes longer, we want to keep the finishing
-	// message in case the user went afk. (In the Notice API, duration 0 means
-	// keeping the notice until the user dismisses it.)
-	const duration = scope === "Document" ? 0 : 5_000;
-	new Notice(msg2, duration);
+	new Notice(msg2, notifDuration);
 
 	return textWithSuggestions;
 }
