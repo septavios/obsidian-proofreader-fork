@@ -16,7 +16,7 @@ function logError(obj: unknown): void {
 export async function openAiRequest(
 	settings: ProofreaderSettings,
 	oldText: string,
-): Promise<{ newText: string; overlength: boolean; cost: number } | undefined> {
+): Promise<{ newText: string; isOverlength: boolean; cost: number } | undefined> {
 	// GUARD
 	if (!settings.openAiApiKey) {
 		new Notice("Please set your OpenAI API key in the plugin settings.");
@@ -69,8 +69,8 @@ export async function openAiRequest(
 	// https://platform.openai.com/docs/guides/conversation-state?api-mode=responses#managing-context-for-text-generation
 	const modelSpec = MODEL_SPECS[settings.openAiModel];
 	const outputTokensUsed = response.json?.usage?.completion_tokens || 0;
-	const overlength = outputTokensUsed >= modelSpec.maxOutputTokens;
-	if (overlength) {
+	const isOverlength = outputTokensUsed >= modelSpec.maxOutputTokens;
+	if (isOverlength) {
 		const msg =
 			"Text is longer than the maximum output supported by the AI model.\n\n" +
 			"Suggestions are thus only made until the cut-off point.";
@@ -83,5 +83,5 @@ export async function openAiRequest(
 		(inputTokensUsed * modelSpec.costPerMillionTokens.input) / 1e6 +
 		(outputTokensUsed * modelSpec.costPerMillionTokens.output) / 1e6;
 
-	return { newText: newText, overlength: overlength, cost: cost };
+	return { newText: newText, isOverlength: isOverlength, cost: cost };
 }

@@ -9,12 +9,12 @@ function getDiffMarkdown(
 	settings: ProofreaderSettings,
 	oldText: string,
 	newText: string,
-	overlength?: boolean,
+	isOverlength?: boolean,
 ): { textWithSuggestions: string; changeCount: number } {
 	const diff = diffWords(oldText, newText);
 
 	// do not remove text after cutoff-length
-	if (overlength) {
+	if (isOverlength) {
 		(diff.at(-1) as Change).removed = false;
 		const cutOffCallout =
 			"\n\n" +
@@ -24,7 +24,7 @@ function getDiffMarkdown(
 		diff.splice(-2, 0, { added: false, removed: false, value: cutOffCallout });
 	}
 
-	// diff objects to ==highlights== and ~~strikethrough~~
+	// convert diff to text with ==highlights== and ~~strikethrough~~ as suggestions
 	let textWithSuggestions = diff
 		.map((part) => {
 			if (!part.added && !part.removed) return part.value;
@@ -55,6 +55,8 @@ async function validateAndGetChangesAndNotify(
 	oldText: string,
 	scope: string,
 ): Promise<string | undefined> {
+	const { app, settings } = plugin;
+
 	// GUARD valid start-text
 	if (oldText.trim() === "") {
 		new Notice(`${scope} is empty.`);
@@ -69,7 +71,7 @@ async function validateAndGetChangesAndNotify(
 	}
 
 	// parameters
-	const fileBefore = plugin.app.workspace.getActiveFile()?.path;
+	const fileBefore = app.workspace.getActiveFile()?.path;
 	const longInput = oldText.length > 1500;
 	const veryLongInput = oldText.length > 15000;
 	// Proofreading a document likely takes longer, we want to keep the finishing
@@ -87,10 +89,10 @@ async function validateAndGetChangesAndNotify(
 	const notice = new Notice(msg, 0);
 
 	// perform request, check that file is still the same
-	const { newText, overlength, cost } = (await openAiRequest(plugin.settings, oldText)) || {};
+	const { newText, isOverlength, cost } = (await openAiRequest(settings, oldText)) || {};
 	notice.hide();
 	if (!newText) return;
-	const fileAfter = plugin.app.workspace.getActiveFile()?.path;
+	const fileAfter = app.workspace.getActiveFile()?.path;
 	if (fileBefore !== fileAfter) {
 		const errmsg = "⚠️ The active file changed since the proofread has been triggered. Aborting.";
 		new Notice(errmsg, notifDuration);
@@ -99,10 +101,10 @@ async function validateAndGetChangesAndNotify(
 
 	// check if diff is even needed
 	const { textWithSuggestions, changeCount } = getDiffMarkdown(
-		plugin.settings,
+		settings,
 		oldText,
 		newText,
-		overlength,
+		isOverlength,
 	);
 	if (newText === oldText || textWithSuggestions === oldText) {
 		new Notice("✅ Text is good, nothing to change.", notifDuration);
@@ -114,7 +116,7 @@ async function validateAndGetChangesAndNotify(
 	const msg2 = [
 		`🤖 ${changeCount} change${pluralS} made.`,
 		"",
-		`est. cost: $${cost?.toFixed(5)}`,
+		`est. cost: $${cost?.toFixed(4)}`,
 	].join("\n");
 	new Notice(msg2, notifDuration);
 
