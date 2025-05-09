@@ -15,7 +15,7 @@ export const MODEL_SPECS = {
 		},
 	},
 	"gpt-4.1-mini": {
-		displayText: "GPT 4.1 mini (recommended)",
+		displayText: "GPT 4.1 mini",
 		maxOutputTokens: 32_768,
 		costPerMillionTokens: { input: 0.4, output: 1.6 },
 		info: {
@@ -44,7 +44,7 @@ export const DEFAULT_SETTINGS = {
 	openAiApiKey: "",
 	openAiModel: "gpt-4.1-nano" as OpenAiModels,
 	staticPrompt:
-		"Act as a professional editor. Please make suggestions how to improve clarity, readability, grammar, and language of the following text. Preserve the original meaning and any technical jargon. Do not change anything about the original meaning. Suggest structural changes only if they significantly improve flow or understanding—avoid unnecessary expansion or major reformatting (e.g., no unwarranted lists). Try to make as little changes as possible, refrain from doing any changes when the writing is already sufficiently clear and concise. Output only the revised text and nothing else. The text is: ",
+		"Act as a professional editor. Please make suggestions how to improve clarity, readability, grammar, and language of the following text. Preserve the original meaning and any technical jargon. Suggest structural changes only if they significantly improve flow or understanding. Avoid unnecessary expansion or major reformatting (e.g., no unwarranted lists). Try to make as little changes as possible, refrain from doing any changes when the writing is already sufficiently clear and concise. Output only the revised text and nothing else. The text is:",
 };
 
 export type ProofreaderSettings = typeof DEFAULT_SETTINGS;
@@ -84,7 +84,8 @@ export class ProofreaderSettingsMenu extends PluginSettingTab {
 				"The nano model is slightly quicker and cheaper. " +
 					"The mini model is slightly higher quality, but also more expensive. " +
 					"Other models are both slower and more expensive; they should only be selected " +
-					"if you intend to use this plugin for tasks other than proofreading.",
+					"by advanced users who customize the prompt and intend to use this plugin for " +
+					"tasks beyond proofreading.",
 			)
 			.addDropdown((dropdown) => {
 				for (const key in MODEL_SPECS) {
@@ -103,10 +104,11 @@ export class ProofreaderSettingsMenu extends PluginSettingTab {
 		new Setting(containerEl).setName("Advanced").setHeading();
 
 		new Setting(containerEl)
-			.setName("Prompt")
+			.setName("System prompt")
 			.setDesc(
-				"The prompt needs to result in the AI answering ONLY with the updated text, otherwise this plugin will not work. " +
-					"Most users do not need to change this setting; only change this if you know what you are doing.",
+				"The LLM must respond ONLY with the updated text for this plugin to work. " +
+					"Most users do not need to change this setting. " +
+					"Only change this if you know what you are doing.",
 			)
 			.addTextArea((textarea) => {
 				textarea.inputEl.setCssProps({ width: "25vw", height: "15em" });
