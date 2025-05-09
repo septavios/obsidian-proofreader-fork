@@ -23,17 +23,22 @@ function getDiffMarkdown(
 	}
 
 	// diff objects to ==highlights== and ~~strikethrough~~
-	const textWithSuggestions = diff
+	let textWithSuggestions = diff
 		.map((part) => {
 			if (!part.added && !part.removed) return part.value;
 			return part.added ? `==${part.value}==` : `~~${part.value}~~`;
 		})
-		.join("")
+		.join("");
+
+	// cleanup
+	textWithSuggestions = textWithSuggestions
 		.replace(/~~"~~==[“”]==/g, '"') // preserve non-smart quotes
 		.replace(/~~'~~==[‘’]==/g, "'")
 		.replace(/(==|~~) /g, " $1") // prevent leading spaces in markup, as they make it invalid
-	const changeCount = (textWithSuggestions.match(/==|~~/g)?.length || 0) / 2;
+		.replace(/~~(.+?)(.)~~==(\1)==/g, "$1~~$2~~") // only removal of one char, e.g. plural-s
+		.replace(/~~(.+?)~~==(?:\1)(.)==/g, "$1==$2=="); // only addition of one char
 
+	const changeCount = (textWithSuggestions.match(/==|~~/g)?.length || 0) / 2;
 	return { textWithSuggestions: textWithSuggestions, changeCount: changeCount };
 }
 
