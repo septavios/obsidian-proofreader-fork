@@ -26,13 +26,12 @@ function getDiffMarkdown(
 	const textWithSuggestions = diff
 		.map((part) => {
 			if (!part.added && !part.removed) return part.value;
-			const value = part.added ? `==${part.value}==` : `~~${part.value}~~`;
-			const fixedValue = value.replace(/^(==|~~) /, " $1"); // prevent leading spaces in markup, which makes it invalid
-			return fixedValue;
+			return part.added ? `==${part.value}==` : `~~${part.value}~~`;
 		})
 		.join("")
-		.replace(/~~"~~==[“”]==/, '"') // preserve non-smart quotes
-		.replace(/~~'~~==[‘’]==/, "'");
+		.replace(/~~"~~==[“”]==/g, '"') // preserve non-smart quotes
+		.replace(/~~'~~==[‘’]==/g, "'")
+		.replace(/(==|~~) /g, " $1") // prevent leading spaces in markup, as they make it invalid
 	const changeCount = (textWithSuggestions.match(/==|~~/g)?.length || 0) / 2;
 
 	return { textWithSuggestions: textWithSuggestions, changeCount: changeCount };
