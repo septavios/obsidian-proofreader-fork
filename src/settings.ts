@@ -45,6 +45,7 @@ export const DEFAULT_SETTINGS = {
 	openAiModel: "gpt-4.1-nano" as OpenAiModels,
 	staticPrompt:
 		"Act as a professional editor. Please make suggestions how to improve clarity, readability, grammar, and language of the following text. Preserve the original meaning and any technical jargon. Suggest structural changes only if they significantly improve flow or understanding. Avoid unnecessary expansion or major reformatting (e.g., no unwarranted lists). Try to make as little changes as possible, refrain from doing any changes when the writing is already sufficiently clear and concise. Output only the revised text and nothing else. The text is:",
+	preserveTextInsideQuotes: false,
 };
 
 export type ProofreaderSettings = typeof DEFAULT_SETTINGS;
@@ -98,6 +99,18 @@ export class ProofreaderSettingsMenu extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				});
 			});
+
+		//────────────────────────────────────────────────────────────────────────
+		// CLEANUP OPTIONS
+		new Setting(containerEl)
+			.setName("Preserve text inside quotes")
+			.setDesc('No changes will be made to text inside quotation marks ("").')
+			.addToggle((toggle) =>
+				toggle.setValue(settings.preserveTextInsideQuotes).onChange(async (value) => {
+					settings.preserveTextInsideQuotes = value;
+					await this.plugin.saveSettings();
+				}),
+			);
 
 		//────────────────────────────────────────────────────────────────────────
 		// ADVANCED

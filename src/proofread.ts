@@ -2,9 +2,11 @@ import { Change, diffWords } from "diff";
 import { Editor, Notice, getFrontMatterInfo } from "obsidian";
 import Proofreader from "./main";
 import { openAiRequest } from "./openai-request";
+import { ProofreaderSettings } from "./settings";
 
 // DOCS https://github.com/kpdecker/jsdiff#readme
 function getDiffMarkdown(
+	settings: ProofreaderSettings,
 	oldText: string,
 	newText: string,
 	overlength?: boolean,
@@ -37,6 +39,12 @@ function getDiffMarkdown(
 		.replace(/(==|~~) /g, " $1") // prevent leading spaces in markup, as they make it invalid
 		.replace(/~~(.+?)(.)~~==(\1)==/g, "$1~~$2~~") // only removal of one char, e.g. plural-s
 		.replace(/~~(.+?)~~==(?:\1)(.)==/g, "$1==$2=="); // only addition of one char
+	if (settings.preserveTextInsideQuotes) {
+		textWithSuggestions = textWithSuggestions.replace(/"([^"]+)"/g, (_, inside) => {
+			const originalText = inside.replace(/~~/g, "").replace(/==.*?==/g, "");
+			return `"${originalText}"`;
+		});
+	}
 
 	const changeCount = (textWithSuggestions.match(/==|~~/g)?.length || 0) / 2;
 	return { textWithSuggestions: textWithSuggestions, changeCount: changeCount };
@@ -90,11 +98,16 @@ async function validateAndGetChangesAndNotify(
 	}
 
 	// check if diff is even needed
-	if (newText === oldText) {
+	const { textWithSuggestions, changeCount } = getDiffMarkdown(
+		plugin.settings,
+		oldText,
+		newText,
+		overlength,
+	);
+	if (newText === oldText || textWithSuggestions === oldText) {
 		new Notice("✅ Text is good, nothing to change.", notifDuration);
 		return;
 	}
-	const { textWithSuggestions, changeCount } = getDiffMarkdown(oldText, newText, overlength);
 
 	// notify on changes
 	const pluralS = changeCount === 1 ? "" : "s";
