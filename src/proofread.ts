@@ -35,8 +35,9 @@ function getDiffMarkdown(
 	// with ==highlights== and ~~strikethrough~~ as suggestions
 	let textWithSuggestions = diff
 		.map((part) => {
-			if (!part.added && !part.removed) return part.value;
-			return part.added ? `==${part.value}==` : `~~${part.value}~~`;
+			if (part.added) return `==${part.value}==`;
+			if (part.removed) return `~~${part.value}~~`;
+			return part.value;
 		})
 		.join("");
 
