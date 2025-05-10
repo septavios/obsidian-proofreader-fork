@@ -11,10 +11,17 @@ function getDiffMarkdown(
 	newText: string,
 	isOverlength?: boolean,
 ): { textWithSuggestions: string; changeCount: number } {
-	const diff = diffWords(oldText, newText);
+	// ENSURE SAME AMOUNT OF SURROUNDING WHITESPACE
+	// (A selection can have surrounding whitespace, but the AI response usually
+	// removes those. This results in the text effectively being trimmed.)
+	const leadingWhitespace = oldText.match(/^(\s*)/)?.[0] || "";
+	const trailingWhitespace = oldText.match(/(\s*)$/)?.[0] || "";
+	newText = newText.replace(/^(\s*)/, leadingWhitespace).replace(/(\s*)$/, trailingWhitespace);
 
-	// do not remove text after cutoff-length
+	// GET DIFF
+	const diff = diffWords(oldText, newText);
 	if (isOverlength) {
+		// do not remove text after cutoff-length
 		(diff.at(-1) as Change).removed = false;
 		const cutOffCallout =
 			"\n\n" +
@@ -24,7 +31,8 @@ function getDiffMarkdown(
 		diff.splice(-2, 0, { added: false, removed: false, value: cutOffCallout });
 	}
 
-	// convert diff to text with ==highlights== and ~~strikethrough~~ as suggestions
+	// CONVERT DIFF TO TEXT
+	// with ==highlights== and ~~strikethrough~~ as suggestions
 	let textWithSuggestions = diff
 		.map((part) => {
 			if (!part.added && !part.removed) return part.value;
@@ -32,7 +40,7 @@ function getDiffMarkdown(
 		})
 		.join("");
 
-	// cleanup
+	// CLEANUP
 	textWithSuggestions = textWithSuggestions
 		.replace(/~~"~~==[“”]==/g, '"') // preserve non-smart quotes
 		.replace(/~~'~~==[‘’]==/g, "'")
@@ -88,10 +96,12 @@ async function validateAndGetChangesAndNotify(
 	}
 	const notice = new Notice(msg, 0);
 
-	// perform request, check that file is still the same
+	// perform request
 	const { newText, isOverlength, cost } = (await openAiRequest(settings, oldText)) || {};
 	notice.hide();
 	if (!newText) return;
+
+	// check if active file changed
 	const fileAfter = app.workspace.getActiveFile()?.path;
 	if (fileBefore !== fileAfter) {
 		const errmsg = "⚠️ The active file changed since the proofread has been triggered. Aborting.";
@@ -106,7 +116,7 @@ async function validateAndGetChangesAndNotify(
 		newText,
 		isOverlength,
 	);
-	if (newText === oldText || textWithSuggestions === oldText) {
+	if (textWithSuggestions === oldText) {
 		new Notice("✅ Text is good, nothing to change.", notifDuration);
 		return;
 	}
