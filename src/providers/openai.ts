@@ -44,19 +44,13 @@ export async function openAiRequest(
 		return;
 	}
 
-	// DETERMINE IF OVERLENGTH
+	// DETERMINE OVERLENGTH & COST
 	// https://platform.openai.com/docs/guides/conversation-state?api-mode=responses#managing-context-for-text-generation
 	const modelSpec = MODEL_SPECS[settings.openAiModel];
+
 	const outputTokensUsed = response.json?.usage?.completion_tokens || 0;
 	const isOverlength = outputTokensUsed >= modelSpec.maxOutputTokens;
-	if (isOverlength) {
-		const msg =
-			"Text is longer than the maximum output supported by the AI model.\n\n" +
-			"Suggestions are thus only made until the cut-off point.";
-		new Notice(msg, 10_000);
-	}
 
-	// ESTIMATE COST
 	const inputTokensUsed = response.json?.usage?.prompt_tokens || 0;
 	const cost =
 		(inputTokensUsed * modelSpec.costPerMillionTokens.input) / 1e6 +

@@ -63,8 +63,6 @@ async function validateAndGetChangesAndNotify(
 	oldText: string,
 	scope: string,
 ): Promise<string | undefined> {
-	const { app, settings } = plugin;
-
 	// GUARD valid start-text
 	if (oldText.trim() === "") {
 		new Notice(`${scope} is empty.`);
@@ -79,6 +77,7 @@ async function validateAndGetChangesAndNotify(
 	}
 
 	// parameters
+	const { app, settings } = plugin;
 	const fileBefore = app.workspace.getActiveFile()?.path;
 	const longInput = oldText.length > 1500;
 	const veryLongInput = oldText.length > 15000;
@@ -122,6 +121,12 @@ async function validateAndGetChangesAndNotify(
 	}
 
 	// notify on changes
+	if (isOverlength) {
+		const msg =
+			"Text is longer than the maximum output supported by the AI model.\n\n" +
+			"Suggestions are thus only made until the cut-off point.";
+		new Notice(msg, 10_000);
+	}
 	const pluralS = changeCount === 1 ? "" : "s";
 	const msg2 = [
 		`🤖 ${changeCount} change${pluralS} made.`,
