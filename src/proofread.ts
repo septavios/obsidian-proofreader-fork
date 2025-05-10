@@ -45,8 +45,9 @@ function getDiffMarkdown(
 		.replace(/~~"~~==[“”]==/g, '"') // preserve non-smart quotes
 		.replace(/~~'~~==[‘’]==/g, "'")
 		.replace(/(==|~~) /g, " $1") // prevent leading spaces in markup, as they make it invalid
-		.replace(/~~(.+?)(.)~~==(\1)==/g, "$1~~$2~~") // only removal of one char, e.g. plural-s
-		.replace(/~~(.+?)~~==(?:\1)(.)==/g, "$1==$2=="); // only addition of one char
+		.replace(/~~(.+?)(.{1,2})~~==(\1)==/g, "$1~~$2~~") // only removal of 1-2 char, e.g. plural-s
+		.replace(/~~(.+?)~~==(?:\1)(.{1,2})==/g, "$1==$2==") // only addition of 1-2 char
+		.replace(/ {2}(?!$)/gm, " "); // rare double spaces created by diff (not EoL due to 2-space-rule)
 	if (settings.preserveTextInsideQuotes) {
 		textWithSuggestions = textWithSuggestions.replace(/"([^"]+)"/g, (_, inside) => {
 			const originalText = inside.replace(/~~/g, "").replace(/==.*?==/g, "");
