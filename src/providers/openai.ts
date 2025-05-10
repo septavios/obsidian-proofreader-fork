@@ -1,6 +1,6 @@
 import { Notice, RequestUrlResponse, requestUrl } from "obsidian";
-import { MODEL_SPECS, ProofreaderSettings } from "./settings";
-import { logError } from "./utils";
+import { MODEL_SPECS, ProofreaderSettings } from "src/settings";
+import { logError } from "src/utils";
 
 export async function openAiRequest(
 	settings: ProofreaderSettings,
@@ -56,7 +56,7 @@ export async function openAiRequest(
 		new Notice(msg, 10_000);
 	}
 
-	// INFORM ABOUT COST
+	// ESTIMATE COST
 	const inputTokensUsed = response.json?.usage?.prompt_tokens || 0;
 	const cost =
 		(inputTokensUsed * modelSpec.costPerMillionTokens.input) / 1e6 +

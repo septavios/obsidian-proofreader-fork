@@ -1,7 +1,7 @@
 import { Change, diffWords } from "diff";
 import { Editor, Notice, getFrontMatterInfo } from "obsidian";
 import Proofreader from "./main";
-import { openAiRequest } from "./openai-request";
+import { openAiRequest } from "./providers/openai";
 import { ProofreaderSettings } from "./settings";
 
 // DOCS https://github.com/kpdecker/jsdiff#readme
