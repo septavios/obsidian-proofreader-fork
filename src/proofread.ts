@@ -58,9 +58,11 @@ function getDiffMarkdown(
 		});
 	}
 	if (settings.preserveBlockquotes) {
-		textWithSuggestions = textWithSuggestions.replace(/^>.*/gm, (blockquote) => {
-			return blockquote.replace(/~~/g, "").replace(/==.*?==/g, "");
-		});
+		textWithSuggestions = textWithSuggestions
+			.replace(/~~>~~/, ">") // if AI removes blockquote itself
+			.replace(/^>(.*)/gm, (blockquote) => {
+				return blockquote.replace(/~~/g, "").replace(/==.*?==/g, "");
+			});
 	}
 
 	const changeCount = (textWithSuggestions.match(/==|~~/g)?.length || 0) / 2;
