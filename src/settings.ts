@@ -46,6 +46,7 @@ export const DEFAULT_SETTINGS = {
 	staticPrompt:
 		"Act as a professional editor. Please make suggestions how to improve clarity, readability, grammar, and language of the following text. Preserve the original meaning and any technical jargon. Suggest structural changes only if they significantly improve flow or understanding. Avoid unnecessary expansion or major reformatting (e.g., no unwarranted lists). Try to make as little changes as possible, refrain from doing any changes when the writing is already sufficiently clear and concise. Output only the revised text and nothing else. The text is:",
 	preserveTextInsideQuotes: false,
+	preserveBlockquotes: false,
 };
 
 export type ProofreaderSettings = typeof DEFAULT_SETTINGS;
@@ -108,6 +109,15 @@ export class ProofreaderSettingsMenu extends PluginSettingTab {
 			.addToggle((toggle) =>
 				toggle.setValue(settings.preserveTextInsideQuotes).onChange(async (value) => {
 					settings.preserveTextInsideQuotes = value;
+					await this.plugin.saveSettings();
+				}),
+			);
+		new Setting(containerEl)
+			.setName("Preserve text in blockquotes and callouts")
+			.setDesc("No changes will be made to lines beginning with `>`.")
+			.addToggle((toggle) =>
+				toggle.setValue(settings.preserveBlockquotes).onChange(async (value) => {
+					settings.preserveBlockquotes = value;
 					await this.plugin.saveSettings();
 				}),
 			);

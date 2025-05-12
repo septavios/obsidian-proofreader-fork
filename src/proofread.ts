@@ -50,10 +50,16 @@ function getDiffMarkdown(
 		.replace(/~~(.+?)(.{1,2})~~==(\1)==/g, "$1~~$2~~") // only removal of 1-2 char, e.g. plural-s
 		.replace(/~~(.+?)~~==(?:\1)(.{1,2})==/g, "$1==$2==") // only addition of 1-2 char
 		.replace(/ {2}(?!$)/gm, " "); // rare double spaces created by diff (not EoL due to 2-space-rule)
+
+	// PRESERVE QUOTES
 	if (settings.preserveTextInsideQuotes) {
-		textWithSuggestions = textWithSuggestions.replace(/"([^"]+)"/g, (_, inside) => {
-			const originalText = inside.replace(/~~/g, "").replace(/==.*?==/g, "");
-			return `"${originalText}"`;
+		textWithSuggestions = textWithSuggestions.replace(/"([^"]+)"/g, (quote) => {
+			return quote.replace(/~~/g, "").replace(/==.*?==/g, "");
+		});
+	}
+	if (settings.preserveBlockquotes) {
+		textWithSuggestions = textWithSuggestions.replace(/^>.*/gm, (blockquote) => {
+			return blockquote.replace(/~~/g, "").replace(/==.*?==/g, "");
 		});
 	}
 
