@@ -5,7 +5,10 @@ function removeMarkup(text: string, mode: "accept" | "reject"): string {
 		mode === "accept"
 			? text.replace(/==/g, "").replace(/~~[^=~]*~~/g, "")
 			: text.replace(/~~/g, "").replace(/==[^=~]*==/g, "");
-	return noMarkup.replaceAll("  ", " "); // remove double spaces left by markup
+	const cleanedUp = noMarkup
+		.replace(/ {2}(?!\n)/g, " ") // double spaces created (not EoL due to 2-space-rule)
+		.replace(/ ([,.:!?])/g, "$1"); // spaces preceding punctuation
+	return cleanedUp;
 }
 
 // Manually calculating the visibility of an offset is necessary, since
