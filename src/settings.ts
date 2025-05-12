@@ -105,7 +105,10 @@ export class ProofreaderSettingsMenu extends PluginSettingTab {
 		// CLEANUP OPTIONS
 		new Setting(containerEl)
 			.setName("Preserve text inside quotes")
-			.setDesc('No changes will be made to text inside quotation marks ("").')
+			.setDesc(
+				'No changes will be made to text inside quotation marks ("").' +
+					"Note that this prevention is not perfect, as the AI will sometimes suggest changes across quotes.",
+			)
 			.addToggle((toggle) =>
 				toggle.setValue(settings.preserveTextInsideQuotes).onChange(async (value) => {
 					settings.preserveTextInsideQuotes = value;
@@ -114,7 +117,10 @@ export class ProofreaderSettingsMenu extends PluginSettingTab {
 			);
 		new Setting(containerEl)
 			.setName("Preserve text in blockquotes and callouts")
-			.setDesc("No changes will be made to lines beginning with `>`.")
+			.setDesc(
+				"No changes will be made to lines beginning with `>`. " +
+					"Note that this prevention is not perfect, as the AI will sometimes suggest changes across quotes.",
+			)
 			.addToggle((toggle) =>
 				toggle.setValue(settings.preserveBlockquotes).onChange(async (value) => {
 					settings.preserveBlockquotes = value;
