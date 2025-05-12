@@ -1,13 +1,22 @@
 import { Editor, EditorPosition, Notice } from "obsidian";
 
+//──────────────────────────────────────────────────────────────────────────────
+
+export function rejectChanges(str: string): string {
+	return str.replace(/~~([^=~]+)~~/g, "$1").replace(/==[^=~]+==/g, "");
+}
+
+function acceptChanges(str: string): string {
+	return str.replace(/~~([^=~]+)~~/g, "$1").replace(/==[^=~]+==/g, "");
+}
+
+//──────────────────────────────────────────────────────────────────────────────
+
 function removeMarkup(text: string, mode: "accept" | "reject"): string {
-	const noMarkup =
-		mode === "accept"
-			? text.replace(/==/g, "").replace(/~~[^=~]*~~/g, "")
-			: text.replace(/~~/g, "").replace(/==[^=~]*==/g, "");
+	const noMarkup = mode === "accept" ? acceptChanges(text) : rejectChanges(text);
 	const cleanedUp = noMarkup
 		.replace(/ {2}(?!\n)/g, " ") // double spaces (not EoL due to 2-space-rule)
-		.replace(/ ([,.:!?])/g, "$1"); // spaces preceding punctuation
+		.replace(/ ([,.:!?'"])/g, "$1"); // spaces preceding punctuation
 	return cleanedUp;
 }
 
@@ -72,7 +81,8 @@ export function acceptOrRejectNextSuggestion(editor: Editor, mode: "accept" | "r
 	let matchStart = 0;
 	let matchEnd = 0;
 	while (true) {
-		const nextMatch = text.slice(searchStart).match(/ ?(==[^~=]*?==|~~[^~=]*~~) ?/);
+		// next match includes previous and next characters to catch leftover spaces
+		const nextMatch = text.slice(searchStart).match(/ ?(==[^~=]*?==|~~[^~=]*~~).?.?/);
 		if (!nextMatch) {
 			new Notice("There are no highlights or strikethroughs until the end of the note.", 3000);
 			return;

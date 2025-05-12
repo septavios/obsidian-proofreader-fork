@@ -1,5 +1,6 @@
 import { Change, diffWords } from "diff";
 import { Editor, Notice, getFrontMatterInfo } from "obsidian";
+import { rejectChanges } from "./accept-reject-suggestions";
 import Proofreader from "./main";
 import { openAiRequest } from "./providers/openai";
 import { ProofreaderSettings } from "./settings";
@@ -33,7 +34,7 @@ function getDiffMarkdown(
 
 	// CONVERT DIFF TO TEXT
 	// with ==highlights== and ~~strikethrough~~ as suggestions
-	let textWithSuggestions = diff
+	let textWithChanges = diff
 		.map((part) => {
 			if (!part.added && !part.removed) return part.value;
 			const withMarkup = (part.added ? `==${part.value}==` : `~~${part.value}~~`)
@@ -44,7 +45,7 @@ function getDiffMarkdown(
 		.join("");
 
 	// CLEANUP
-	textWithSuggestions = textWithSuggestions
+	textWithChanges = textWithChanges
 		.replace(/~~\[\^\w+\]~~/g, "$1") // preserve footnotes
 		.replace(/~~"~~==[“”]==/g, '"') // preserve non-smart quotes
 		.replace(/~~'~~==[‘’]==/g, "'")
@@ -54,20 +55,16 @@ function getDiffMarkdown(
 
 	// PRESERVE QUOTES
 	if (settings.preserveBlockquotes) {
-		textWithSuggestions = textWithSuggestions
+		textWithChanges = textWithChanges
 			.replace(/~~>~~/, ">") // if AI removes blockquote itself
-			.replace(/^>(.*)/gm, (blockquote) => {
-				return blockquote.replace(/~~/g, "").replace(/==.*?==/g, "");
-			});
+			.replace(/^>(.*)/gm, (blockquote) => rejectChanges(blockquote));
 	}
 	if (settings.preserveTextInsideQuotes) {
-		textWithSuggestions = textWithSuggestions.replace(/"([^"]+)"/g, (quote) => {
-			return quote.replace(/~~/g, "").replace(/==.*?==/g, "");
-		});
+		textWithChanges = textWithChanges.replace(/"[^"]+"/g, (quote) => rejectChanges(quote));
 	}
 
-	const changeCount = (textWithSuggestions.match(/==|~~/g)?.length || 0) / 2;
-	return { textWithSuggestions: textWithSuggestions, changeCount: changeCount };
+	const changeCount = (textWithChanges.match(/==|~~/g)?.length || 0) / 2;
+	return { textWithSuggestions: textWithChanges, changeCount: changeCount };
 }
 
 async function validateAndGetChangesAndNotify(
