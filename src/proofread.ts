@@ -45,6 +45,7 @@ function getDiffMarkdown(
 
 	// CLEANUP
 	textWithSuggestions = textWithSuggestions
+		.replace(/~~\[\^\w+\]~~/g, "$1") // preserve footnotes
 		.replace(/~~"~~==[“”]==/g, '"') // preserve non-smart quotes
 		.replace(/~~'~~==[‘’]==/g, "'")
 		.replace(/~~(.+?)(.{1,2})~~==(\1)==/g, "$1~~$2~~") // only removal of 1-2 char, e.g. plural-s
@@ -52,17 +53,17 @@ function getDiffMarkdown(
 		.replace(/ {2}(?!$)/gm, " "); // rare double spaces created by diff (not EoL due to 2-space-rule)
 
 	// PRESERVE QUOTES
-	if (settings.preserveTextInsideQuotes) {
-		textWithSuggestions = textWithSuggestions.replace(/"([^"]+)"/g, (quote) => {
-			return quote.replace(/~~/g, "").replace(/==.*?==/g, "");
-		});
-	}
 	if (settings.preserveBlockquotes) {
 		textWithSuggestions = textWithSuggestions
 			.replace(/~~>~~/, ">") // if AI removes blockquote itself
 			.replace(/^>(.*)/gm, (blockquote) => {
 				return blockquote.replace(/~~/g, "").replace(/==.*?==/g, "");
 			});
+	}
+	if (settings.preserveTextInsideQuotes) {
+		textWithSuggestions = textWithSuggestions.replace(/"([^"]+)"/g, (quote) => {
+			return quote.replace(/~~/g, "").replace(/==.*?==/g, "");
+		});
 	}
 
 	const changeCount = (textWithSuggestions.match(/==|~~/g)?.length || 0) / 2;
