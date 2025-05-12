@@ -35,9 +35,11 @@ function getDiffMarkdown(
 	// with ==highlights== and ~~strikethrough~~ as suggestions
 	let textWithSuggestions = diff
 		.map((part) => {
-			if (part.added) return `==${part.value}==`;
-			if (part.removed) return `~~${part.value}~~`;
-			return part.value;
+			if (!part.added && !part.removed) return part.value;
+			const withMarkup = (part.added ? `==${part.value}==` : `~~${part.value}~~`)
+				.replace(/^(==|~~)(\s)/, "$2$1") // prevent leading spaces as they make markup invalid
+				.replace(/(\s)(==|~~)$/, "$2$1"); // trailing spaces
+			return withMarkup;
 		})
 		.join("");
 
@@ -45,7 +47,6 @@ function getDiffMarkdown(
 	textWithSuggestions = textWithSuggestions
 		.replace(/~~"~~==[“”]==/g, '"') // preserve non-smart quotes
 		.replace(/~~'~~==[‘’]==/g, "'")
-		.replace(/(==|~~) /g, " $1") // prevent leading spaces in markup, as they make it invalid
 		.replace(/~~(.+?)(.{1,2})~~==(\1)==/g, "$1~~$2~~") // only removal of 1-2 char, e.g. plural-s
 		.replace(/~~(.+?)~~==(?:\1)(.{1,2})==/g, "$1==$2==") // only addition of 1-2 char
 		.replace(/ {2}(?!$)/gm, " "); // rare double spaces created by diff (not EoL due to 2-space-rule)
