@@ -1,9 +1,11 @@
 import { Editor, EditorPosition, Notice } from "obsidian";
 
 function removeMarkup(text: string, mode: "accept" | "reject"): string {
-	return mode === "accept"
-		? text.replace(/==/g, "").replace(/~~.*?~~/g, "")
-		: text.replace(/~~/g, "").replace(/==.*?==/g, "");
+	const noMarkup =
+		mode === "accept"
+			? text.replace(/==/g, "").replace(/~~[^=~]*~~/g, "")
+			: text.replace(/~~/g, "").replace(/==[^=~]*==/g, "");
+	return noMarkup.replaceAll("  ", " "); // remove double spaces left by markup
 }
 
 // Manually calculating the visibility of an offset is necessary, since
@@ -67,7 +69,7 @@ export function acceptOrRejectNextSuggestion(editor: Editor, mode: "accept" | "r
 	let matchStart = 0;
 	let matchEnd = 0;
 	while (true) {
-		const nextMatch = text.slice(searchStart).match(/(==|~~)[^~=]*?\1/);
+		const nextMatch = text.slice(searchStart).match(/ ?(==[^~=]*?==|~~[^~=]*~~) ?/);
 		if (!nextMatch) {
 			new Notice("There are no highlights or strikethroughs until the end of the note.", 3000);
 			return;
