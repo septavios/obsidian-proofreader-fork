@@ -6,7 +6,7 @@ function removeMarkup(text: string, mode: "accept" | "reject"): string {
 			? text.replace(/==/g, "").replace(/~~[^=~]*~~/g, "")
 			: text.replace(/~~/g, "").replace(/==[^=~]*==/g, "");
 	const cleanedUp = noMarkup
-		.replace(/ {2}(?!\n)/g, " ") // double spaces created (not EoL due to 2-space-rule)
+		.replace(/ {2}(?!\n)/g, " ") // double spaces (not EoL due to 2-space-rule)
 		.replace(/ ([,.:!?])/g, "$1"); // spaces preceding punctuation
 	return cleanedUp;
 }
