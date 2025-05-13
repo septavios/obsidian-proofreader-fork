@@ -19,6 +19,7 @@ feature in word processing apps.
 	* [Get an OpenAI API key](#get-an-openai-api-key)
 - [Usage](#usage)
 - [Visual appearance of the changes](#visual-appearance-of-the-changes)
+- [Testimonials](#testimonials)
 - [Plugin development](#plugin-development)
 - [About the developer](#about-the-developer)
 
@@ -38,8 +39,8 @@ feature in word processing apps.
 | Method of incorporating changes       | mostly mouse clicks                             | keyboard shortcuts                                                           |
 | Additional benefits                   | Editor makes general comments on writing style. | Plugin can also be used to quickly proofread single sentences or paragraphs. |
 
-[^1]: Estimated pricing for the [GPT 4.1 mini and nano
-	models](https://platform.openai.com/docs/models/) in April 2025. The plugin
+[^1]: Estimated pricing for the [GPT 4.1 nano
+	model](https://platform.openai.com/docs/models/) in April 2025. The plugin
 	developer is not responsible if the actual costs differ. You can track your
 	usage costs [on this page](https://platform.openai.com/usage).
 
@@ -61,9 +62,10 @@ feature in word processing apps.
 
 ## Usage
 1. Use the command `Proofread selection/paragraph` to check the selected
-   text. If there is no selection, the command will check the current paragraph
-   (line). Alternatively, you can also check the whole document with `Proofread
-   full document`.
+   text. If there is no selection, the command will check the current paragraph.
+	* Alternatively, you can also check the whole document with `Proofread full
+	  document`. However, note that the quality of AI suggestions tends to
+	  decrease when proofreading too much text at once.
 2. The changes are automatically inserted.
 3. Accept/reject changes with the `Accept suggestions in selection/paragraph`.
    Same as the proofreading command, the `accept` and `reject` commands affect
@@ -77,8 +79,8 @@ feature in word processing apps.
 
 ## Visual appearance of the changes
 You can add the following CSS snippet to make highlights and strikethroughs
-appear like suggested changes, similar to the screenshot further above. ([How to
-add CSS snippets.](https://help.obsidian.md/snippets))
+appear like suggested changes, similar to the screenshot further above. ([How
+to add CSS snippets.](https://help.obsidian.md/snippets))
 
 ```css
 .cm-strikethrough {
@@ -117,7 +119,7 @@ digital economy. For my PhD project, I investigate the governance of the app
 economy and how software ecosystems manage the tension between innovation and
 compatibility. If you are interested in this subject, feel free to get in touch.
 
-- [Academic website](https://chris-grieser.de/)
+- [Website](https://chris-grieser.de/)
 - [ResearchGate](https://www.researchgate.net/profile/Christopher-Grieser)
 - [Mastodon](https://pkm.social/@pseudometa)
 - [LinkedIn](https://www.linkedin.com/in/christopher-grieser-ba693b17a/)
