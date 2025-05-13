@@ -32,7 +32,8 @@ export async function openAiRequest(
 		console.debug("[Proofreader plugin] OpenAI response", response);
 	} catch (error) {
 		if ((error as { status: number }).status === 401) {
-			new Notice("OpenAI API key is not valid. Please verify the key in the plugin settings.");
+			const msg = "OpenAI API key is not valid. Please verify the key in the plugin settings.";
+			new Notice(msg, 6_000);
 			return;
 		}
 		logError(error);

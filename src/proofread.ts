@@ -37,10 +37,8 @@ function getDiffMarkdown(
 	let textWithChanges = diff
 		.map((part) => {
 			if (!part.added && !part.removed) return part.value;
-			const withMarkup = (part.added ? `==${part.value}==` : `~~${part.value}~~`)
-				.replace(/^(==|~~)(\s)/, "$2$1") // prevent leading spaces as they make markup invalid
-				.replace(/(\s)(==|~~)$/, "$2$1"); // trailing spaces
-			return withMarkup;
+			const withMarkup = part.added ? `==${part.value}==` : `~~${part.value}~~`;
+			return withMarkup.replace(/^(==|~~)(\s)/, "$2$1"); // prevent leading spaces as they make markup invalid
 		})
 		.join("");
 
@@ -56,8 +54,9 @@ function getDiffMarkdown(
 	// PRESERVE QUOTES
 	if (settings.preserveBlockquotes) {
 		textWithChanges = textWithChanges
-			.replace(/~~>~~/, ">") // if AI removes blockquote itself
-			.replace(/^>(.*)/gm, (blockquote) => rejectChanges(blockquote));
+			.replace(/^~~>~~/gm, ">") // if AI removes blockquote marker
+			.replace(/^~~(>[^~=]*)~~$/gm, "$1") // if AI removes blockquote itself
+			.replace(/^>.*/gm, (blockquote) => rejectChanges(blockquote));
 	}
 	if (settings.preserveTextInsideQuotes) {
 		textWithChanges = textWithChanges.replace(/"[^"]+"/g, (quote) => rejectChanges(quote));

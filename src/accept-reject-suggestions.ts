@@ -16,7 +16,7 @@ function removeMarkup(text: string, mode: "accept" | "reject"): string {
 	const noMarkup = mode === "accept" ? acceptChanges(text) : rejectChanges(text);
 	const cleanedUp = noMarkup
 		.replace(/ {2}(?!\n)/g, " ") // double spaces (not EoL due to 2-space-rule)
-		.replace(/ ([,.:!?'"])/g, "$1"); // spaces preceding punctuation
+		.replace(/ ([,.:;—–!?'"])/g, "$1"); // spaces preceding punctuation
 	return cleanedUp;
 }
 
@@ -82,7 +82,7 @@ export function acceptOrRejectNextSuggestion(editor: Editor, mode: "accept" | "r
 	let matchEnd = 0;
 	while (true) {
 		// next match includes previous and next characters to catch leftover spaces
-		const nextMatch = text.slice(searchStart).match(/ ?(==[^~=]*?==|~~[^~=]*~~).?.?/);
+		const nextMatch = text.slice(searchStart).match(/ ?(==[^~=]*?==|~~[^~=]*~~).?/);
 		if (!nextMatch) {
 			new Notice("There are no highlights or strikethroughs until the end of the note.", 3000);
 			return;
