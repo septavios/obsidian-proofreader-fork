@@ -7,7 +7,7 @@ export function rejectChanges(str: string): string {
 }
 
 function acceptChanges(str: string): string {
-	return str.replace(/~~([^=~]+)~~/g, "$1").replace(/==[^=~]+==/g, "");
+	return str.replace(/==([^=~]+)==/g, "$1").replace(/~~[^=~]+~~/g, "");
 }
 
 //──────────────────────────────────────────────────────────────────────────────
