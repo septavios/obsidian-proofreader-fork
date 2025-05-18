@@ -1,48 +1,11 @@
 import { PluginSettingTab, Setting } from "obsidian";
 import Proofreader from "./main";
-
-// The `nano` and `mini` models are sufficiently good sufficiently good output
-// for the very focussed task of just fixing language
-export const MODEL_SPECS = {
-	"gpt-4.1-nano": {
-		displayText: "GPT 4.1 nano (recommended)",
-		maxOutputTokens: 32_768,
-		costPerMillionTokens: { input: 0.1, output: 0.4 },
-		info: {
-			intelligence: 2,
-			speed: 5,
-			url: "https://platform.openai.com/docs/models/gpt-4.1-nano",
-		},
-	},
-	"gpt-4.1-mini": {
-		displayText: "GPT 4.1 mini",
-		maxOutputTokens: 32_768,
-		costPerMillionTokens: { input: 0.4, output: 1.6 },
-		info: {
-			intelligence: 3,
-			speed: 4,
-			url: "https://platform.openai.com/docs/models/gpt-4.1-mini",
-		},
-	},
-	"gpt-4.1": {
-		displayText: "GPT 4.1 (for tasks beyond proofreading)",
-		maxOutputTokens: 32_768,
-		costPerMillionTokens: { input: 2.0, output: 8.0 },
-		info: {
-			intelligence: 4,
-			speed: 3,
-			url: "https://platform.openai.com/docs/models/gpt-4.1",
-		},
-	},
-};
-
-type OpenAiModels = keyof typeof MODEL_SPECS;
-
-//──────────────────────────────────────────────────────────────────────────────
+import { ModelName } from "./providers/adapter";
+import { MODEL_SPECS } from "./providers/model-info";
 
 export const DEFAULT_SETTINGS = {
 	openAiApiKey: "",
-	openAiModel: "gpt-4.1-nano" as OpenAiModels,
+	model: "gpt-4.1-nano" as ModelName,
 	staticPrompt:
 		"Act as a professional editor. Please make suggestions how to improve clarity, readability, grammar, and language of the following text. Preserve the original meaning and any technical jargon. Suggest structural changes only if they significantly improve flow or understanding. Avoid unnecessary expansion or major reformatting (e.g., no unwarranted lists). Try to make as little changes as possible, refrain from doing any changes when the writing is already sufficiently clear and concise. Output only the revised text and nothing else. The text is:",
 	preserveTextInsideQuotes: false,
@@ -84,19 +47,16 @@ export class ProofreaderSettingsMenu extends PluginSettingTab {
 			.setName("Model")
 			.setDesc(
 				"The nano model is slightly quicker and cheaper. " +
-					"The mini model is slightly higher quality, but also more expensive. " +
-					"Other models are both slower and more expensive; they should only be selected " +
-					"by advanced users who customize the prompt and intend to use this plugin for " +
-					"tasks beyond proofreading.",
+					"The mini model is slightly higher quality, but also more expensive. ",
 			)
 			.addDropdown((dropdown) => {
 				for (const key in MODEL_SPECS) {
 					if (!Object.hasOwn(MODEL_SPECS, key)) continue;
-					const display = MODEL_SPECS[key as OpenAiModels].displayText;
-					dropdown.addOption(key, display);
+					const model = MODEL_SPECS[key as ModelName];
+					dropdown.addOption(key, model.displayText);
 				}
-				dropdown.setValue(settings.openAiModel).onChange(async (value) => {
-					settings.openAiModel = value as OpenAiModels;
+				dropdown.setValue(settings.model).onChange(async (value) => {
+					settings.model = value as ModelName;
 					await this.plugin.saveSettings();
 				});
 			});

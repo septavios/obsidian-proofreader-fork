@@ -1,17 +1,14 @@
 import { Notice, RequestUrlResponse, requestUrl } from "obsidian";
-import { MODEL_SPECS, ProofreaderSettings } from "src/settings";
 import { logError } from "src/utils";
+import { ProviderAdapter } from "./adapter";
+import { MODEL_SPECS } from "./model-info";
 
-export async function openAiRequest(
-	settings: ProofreaderSettings,
-	oldText: string,
-): Promise<{ newText: string; isOverlength: boolean; cost: number } | undefined> {
+export const openAiRequest: ProviderAdapter = async (settings, oldText) => {
 	if (!settings.openAiApiKey) {
 		new Notice("Please set your OpenAI API key in the plugin settings.");
 		return;
 	}
 
-	// SEND REQUEST
 	let response: RequestUrlResponse;
 	try {
 		// DOCS https://platform.openai.com/docs/api-reference/chat
@@ -22,7 +19,7 @@ export async function openAiRequest(
 			// biome-ignore lint/style/useNamingConvention: not by me
 			headers: { Authorization: "Bearer " + settings.openAiApiKey },
 			body: JSON.stringify({
-				model: settings.openAiModel,
+				model: settings.model,
 				messages: [
 					{ role: "developer", content: settings.staticPrompt },
 					{ role: "user", content: oldText },
@@ -45,17 +42,10 @@ export async function openAiRequest(
 		return;
 	}
 
-	// DETERMINE OVERLENGTH & COST
+	// determine overlength
 	// https://platform.openai.com/docs/guides/conversation-state?api-mode=responses#managing-context-for-text-generation
-	const modelSpec = MODEL_SPECS[settings.openAiModel];
-
 	const outputTokensUsed = response.json?.usage?.completion_tokens || 0;
-	const isOverlength = outputTokensUsed >= modelSpec.maxOutputTokens;
+	const isOverlength = outputTokensUsed >= MODEL_SPECS[settings.model].maxOutputTokens;
 
-	const inputTokensUsed = response.json?.usage?.prompt_tokens || 0;
-	const cost =
-		(inputTokensUsed * modelSpec.costPerMillionTokens.input) / 1e6 +
-		(outputTokensUsed * modelSpec.costPerMillionTokens.output) / 1e6;
-
-	return { newText: newText, isOverlength: isOverlength, cost: cost };
-}
+	return { newText: newText, isOverlength: isOverlength };
+};

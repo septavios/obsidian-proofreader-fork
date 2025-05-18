@@ -2,10 +2,10 @@ import { Change, diffWords } from "diff";
 import { Editor, Notice, getFrontMatterInfo } from "obsidian";
 import { rejectChanges } from "./accept-reject-suggestions";
 import Proofreader from "./main";
-import { openAiRequest } from "./providers/openai";
+import { ModelName, ProviderAdapter } from "./providers/adapter";
+import { MODEL_SPECS, PROVIDER_REQUEST_MAP } from "./providers/model-info";
 import { ProofreaderSettings } from "./settings";
 
-// DOCS https://github.com/kpdecker/jsdiff#readme
 function getDiffMarkdown(
 	settings: ProofreaderSettings,
 	oldText: string,
@@ -20,6 +20,7 @@ function getDiffMarkdown(
 	newText = newText.replace(/^(\s*)/, leadingWhitespace).replace(/(\s*)$/, trailingWhitespace);
 
 	// GET DIFF
+	// DOCS https://github.com/kpdecker/jsdiff#readme
 	const diff = diffWords(oldText, newText);
 	if (isOverlength) {
 		// do not remove text after cutoff-length
@@ -71,6 +72,15 @@ async function validateAndGetChangesAndNotify(
 	oldText: string,
 	scope: string,
 ): Promise<string | undefined> {
+	const { app, settings } = plugin;
+
+	// GUARD outdated model
+	const model = MODEL_SPECS[settings.model as ModelName];
+	if (!model) {
+		const errmsg = `⚠️ You are using an outdated model: "${settings.model}". Please go to the settings and select a more recent one.`;
+		new Notice(errmsg, 10_000);
+		return;
+	}
 	// GUARD valid start-text
 	if (oldText.trim() === "") {
 		new Notice(`${scope} is empty.`);
@@ -85,7 +95,6 @@ async function validateAndGetChangesAndNotify(
 	}
 
 	// parameters
-	const { app, settings } = plugin;
 	const fileBefore = app.workspace.getActiveFile()?.path;
 	const longInput = oldText.length > 1500;
 	const veryLongInput = oldText.length > 15000;
@@ -95,16 +104,18 @@ async function validateAndGetChangesAndNotify(
 	const notifDuration = longInput ? 0 : 4_000;
 
 	// notify on start
-	let msg = `🤖 ${scope} is being proofread…`;
+	let msgBeforeRequest = `🤖 ${scope} is being proofread…`;
 	if (longInput) {
-		msg += "\n\nDue to the length of the text, this may take a moment.";
-		if (veryLongInput) msg += " (A minute or longer.)";
-		msg += "\n\nDo not go to a different file or change the original text in the meantime.";
+		msgBeforeRequest += "\n\nDue to the length of the text, this may take a moment.";
+		if (veryLongInput) msgBeforeRequest += " (A minute or longer.)";
+		msgBeforeRequest +=
+			"\n\nDo not go to a different file or change the original text in the meantime.";
 	}
-	const notice = new Notice(msg, 0);
+	const notice = new Notice(msgBeforeRequest, 0);
 
 	// perform request
-	const { newText, isOverlength, cost } = (await openAiRequest(settings, oldText)) || {};
+	const requestFunc: ProviderAdapter = PROVIDER_REQUEST_MAP[model.provider];
+	const { newText, isOverlength } = (await requestFunc(settings, oldText)) || {};
 	notice.hide();
 	if (!newText) return;
 
@@ -136,12 +147,7 @@ async function validateAndGetChangesAndNotify(
 		new Notice(msg, 10_000);
 	}
 	const pluralS = changeCount === 1 ? "" : "s";
-	const msg2 = [
-		`🤖 ${changeCount} change${pluralS} made.`,
-		"",
-		`est. cost: $${cost?.toFixed(4)}`,
-	].join("\n");
-	new Notice(msg2, notifDuration);
+	new Notice(`🤖 ${changeCount} change${pluralS} made.`, notifDuration);
 
 	return textWithSuggestions;
 }

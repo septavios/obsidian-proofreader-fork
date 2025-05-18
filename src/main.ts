@@ -1,12 +1,7 @@
 import { Plugin } from "obsidian";
 import { acceptOrRejectInText, acceptOrRejectNextSuggestion } from "./accept-reject-suggestions";
 import { proofreadDocument, proofreadText } from "./proofread";
-import {
-	DEFAULT_SETTINGS,
-	MODEL_SPECS,
-	ProofreaderSettings,
-	ProofreaderSettingsMenu,
-} from "./settings";
+import { DEFAULT_SETTINGS, ProofreaderSettings, ProofreaderSettingsMenu } from "./settings";
 
 // biome-ignore lint/style/noDefaultExport: required for Obsidian plugins to work
 export default class Proofreader extends Plugin {
@@ -77,14 +72,15 @@ export default class Proofreader extends Plugin {
 	}
 
 	async loadSettings(): Promise<void> {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+		const settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
 
-		// In case the plugin updates to newer models, ensure the user will not be
-		// left with an outdated model from the settings.
-		const outdatedModel = !Object.keys(MODEL_SPECS).includes(this.settings.openAiModel);
-		if (outdatedModel) {
-			this.settings.openAiModel = DEFAULT_SETTINGS.openAiModel;
-			await this.saveSettings();
+		// DEPRECATION (2025-05-18)
+		if (settings.openAiModel) {
+			settings.model = settings.openAiModel;
+			settings.openAiModel = undefined;
+			this.saveData(settings);
 		}
+
+		this.settings = settings;
 	}
 }
