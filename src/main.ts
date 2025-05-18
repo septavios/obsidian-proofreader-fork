@@ -63,7 +63,17 @@ export default class Proofreader extends Plugin {
 	}
 
 	async saveSettings(): Promise<void> {
-		await this.saveData(this.settings);
+		// Ensure default values are not written, so the user will not load
+		// oudated defaults when the default settings are changed.
+		const settings = structuredClone(this.settings);
+		for (const key in settings) {
+			if (!Object.hasOwn(settings, key)) continue;
+			const name = key as keyof ProofreaderSettings;
+			// @ts-expect-error intentional removal
+			if (settings[name] === DEFAULT_SETTINGS[name]) settings[name] = undefined;
+		}
+
+		await this.saveData(settings);
 	}
 
 	async loadSettings(): Promise<void> {
