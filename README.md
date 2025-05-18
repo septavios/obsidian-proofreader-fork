@@ -120,7 +120,7 @@ just check  # runs the pre-commit hook (without committing)
 
 ### Adding support for new LLMs
 1. Create a new adapter for the LLM in
-   [./src/providers/](./src/providers/); this should take ~50 lines of code.
+   [./src/providers/](./src/providers/). This should take ~50 lines of code.
 2. In [./src/providers/model-info.ts](./src/providers/model-info.ts), add the
    adapter function to `PROVIDER_ADAPTER_MAP`, and add models for the new
    provider to `MODEL_SPECS`.

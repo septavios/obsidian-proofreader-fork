@@ -77,7 +77,7 @@ async function validateAndGetChangesAndNotify(
 	// GUARD outdated model
 	const model = MODEL_SPECS[settings.model as ModelName];
 	if (!model) {
-		const errmsg = `⚠️ You are using an outdated model: "${settings.model}". Please go to the settings and select a more recent one.`;
+		const errmsg = `⚠️ The model "${settings.model}" is outdated. Please select a more recent one in the settings.`;
 		new Notice(errmsg, 10_000);
 		return;
 	}
