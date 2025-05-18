@@ -10,6 +10,7 @@ export const MODEL_SPECS = {
 		provider: "openai",
 		displayText: "GPT 4.1 nano (recommended)",
 		maxOutputTokens: 32_768,
+		// `info` key is not actively used, just informational
 		info: {
 			costPerMillionTokens: { input: 0.1, output: 0.4 },
 			intelligence: 2,

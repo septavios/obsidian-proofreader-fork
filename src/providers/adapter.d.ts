@@ -13,10 +13,3 @@ export type ProviderAdapter = (
 
 export type ModelName = keyof typeof MODEL_SPECS;
 export type ProviderName = (typeof MODEL_SPECS)[ModelName]["provider"];
-
-export type ModelSpec = {
-	provider: string;
-	displayText: string;
-	maxOutputTokens: number;
-	info: unknown; // not used, just information value
-};
