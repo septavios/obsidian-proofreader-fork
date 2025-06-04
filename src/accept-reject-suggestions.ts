@@ -93,7 +93,11 @@ export function acceptOrRejectNextSuggestion(editor: Editor, mode: "accept" | "r
 		const cursorOnMatch = cursorOffset >= matchStart && cursorOffset <= matchEnd;
 		const cursorBeforeMatch = cursorOffset <= matchStart;
 		if (cursorOnMatch || cursorBeforeMatch) break;
-		searchStart = matchEnd;
+
+		// -1 to account for the next character being included in the pattern,
+		// (strings with directly adjacent markup such as `==foobar==~~baz~~`
+		// would otherwise be sliced to `~baz~~` on the next iteration)
+		searchStart = matchEnd - 1;
 	}
 	const matchStartPos = editor.offsetToPos(matchStart);
 	const matchEndPos = editor.offsetToPos(matchEnd);
