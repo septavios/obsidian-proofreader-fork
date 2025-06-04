@@ -16,7 +16,7 @@ function removeMarkup(text: string, mode: "accept" | "reject"): string {
 	const noMarkup = mode === "accept" ? acceptChanges(text) : rejectChanges(text);
 	const cleanedUp = noMarkup
 		.replace(/ {2}(?!\n)/g, " ") // double spaces (not EoL due to 2-space-rule)
-		.replace(/ ([,.:;—–!?'"])/g, "$1"); // spaces preceding punctuation
+		.replace(/ ([,.:;—–!?])/g, "$1"); // spaces preceding punctuation
 	return cleanedUp;
 }
 
