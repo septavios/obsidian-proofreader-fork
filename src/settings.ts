@@ -10,6 +10,7 @@ export const DEFAULT_SETTINGS = {
 		"Act as a professional editor. Please make suggestions how to improve clarity, readability, grammar, and language of the following text. Preserve the original meaning and any technical jargon. Suggest structural changes only if they significantly improve flow or understanding. Avoid unnecessary expansion or major reformatting (e.g., no unwarranted lists). Try to make as little changes as possible, refrain from doing any changes when the writing is already sufficiently clear and concise. Output only the revised text and nothing else. The text is:",
 	preserveTextInsideQuotes: false,
 	preserveBlockquotes: false,
+	preserveNonSmartPuncation: false,
 };
 
 export type ProofreaderSettings = typeof DEFAULT_SETTINGS;
@@ -67,8 +68,8 @@ export class ProofreaderSettingsMenu extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName("Preserve text inside quotes")
 			.setDesc(
-				'No changes will be made to text inside quotation marks ("").' +
-					"Note that this prevention is not perfect, as the AI will sometimes suggest changes across quotes.",
+				'No changes will be made to text inside quotation marks (""). ' +
+					"Note that this is not perfect, as the AI will sometimes suggest changes across quotes.",
 			)
 			.addToggle((toggle) =>
 				toggle.setValue(settings.preserveTextInsideQuotes).onChange(async (value) => {
@@ -80,11 +81,24 @@ export class ProofreaderSettingsMenu extends PluginSettingTab {
 			.setName("Preserve text in blockquotes and callouts")
 			.setDesc(
 				"No changes will be made to lines beginning with `>`. " +
-					"Note that this prevention is not perfect, as the AI will sometimes suggest changes across quotes.",
+					"Note that this is not perfect, as the AI will sometimes suggest changes across paragraphs.",
 			)
 			.addToggle((toggle) =>
 				toggle.setValue(settings.preserveBlockquotes).onChange(async (value) => {
 					settings.preserveBlockquotes = value;
+					await this.plugin.saveSettings();
+				}),
+			);
+		new Setting(containerEl)
+			.setName("Preserve non-smart punctuation")
+			.setDesc(
+				"Prevent the AI from changing non-smart punctuation to their smart counterparts, " +
+					' for instance changing `"` to `“` or `12-34` to `12–34`. ' +
+					"This can be relevant when using tools like `pandoc`, which convert non-smart punctuation based on how they are configured.",
+			)
+			.addToggle((toggle) =>
+				toggle.setValue(settings.preserveNonSmartPuncation).onChange(async (value) => {
+					settings.preserveNonSmartPuncation = value;
 					await this.plugin.saveSettings();
 				}),
 			);

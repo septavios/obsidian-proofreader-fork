@@ -46,11 +46,17 @@ function getDiffMarkdown(
 	// CLEANUP
 	textWithChanges = textWithChanges
 		.replace(/~~\[\^\w+\]~~/g, "$1") // preserve footnotes
-		.replace(/~~"~~==[“”]==/g, '"') // preserve non-smart quotes
-		.replace(/~~'~~==[‘’]==/g, "'")
 		.replace(/~~(.+?)(.{1,2})~~==(\1)==/g, "$1~~$2~~") // only removal of 1-2 char, e.g. plural-s
 		.replace(/~~(.+?)~~==(?:\1)(.{1,2})==/g, "$1==$2==") // only addition of 1-2 char
 		.replace(/ {2}(?!$)/gm, " "); // rare double spaces created by diff (not EoL due to 2-space-rule)
+
+	// PRESERVE SPECIAL CHARACTERS
+	if (settings.preserveNonSmartPuncation) {
+		textWithChanges = textWithChanges
+			.replace(/~~"~~==[“”]==/g, '"') // preserve non-smart quotes
+			.replace(/~~'~~==[‘’]==/g, "'")
+			.replace(/(\d)~~-~~==–==(\d)/g, "$1-$2"); // preserve non-smart dashes in number ranges
+	}
 
 	// PRESERVE QUOTES
 	if (settings.preserveBlockquotes) {
