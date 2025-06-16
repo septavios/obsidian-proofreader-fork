@@ -39,9 +39,15 @@ function getDiffMarkdown(
 		.map((part) => {
 			if (!part.added && !part.removed) return part.value;
 			const withMarkup = part.added ? `==${part.value}==` : `~~${part.value}~~`;
-			return withMarkup.replace(/^(==|~~)(\s)/, "$2$1"); // prevent leading spaces as they make markup invalid
+
+			// FIX for Obsidian live preview: leading spaces result in missing markup
+			const fixedForObsidian = withMarkup.replace(/^(==|~~)( )/, "$2$1");
+			return fixedForObsidian;
 		})
 		.join("");
+
+	// FIX for Obsidian live preview: isolated trailing markup rendered wrong
+	textWithChanges = textWithChanges.replace(/(==|~~)([^=~]+) \1 /g, "$1$2$1 ");
 
 	// CLEANUP
 	textWithChanges = textWithChanges
