@@ -1,4 +1,4 @@
-import { Editor, EditorPosition, Notice } from "obsidian";
+import { type Editor, type EditorPosition, Notice } from "obsidian";
 
 //──────────────────────────────────────────────────────────────────────────────
 
@@ -74,7 +74,10 @@ export function acceptOrRejectNextSuggestion(editor: Editor, mode: "accept" | "r
 	// FIND NEXT SUGGESTION
 	// since highlights and strikethroughs do not span lines, it is safe to
 	// start searching at the beginning of the cursor line
-	const startOfCursorlineOffset = editor.posToOffset({ line: cursor.line, ch: 0 });
+	const startOfCursorlineOffset = editor.posToOffset({
+		line: cursor.line,
+		ch: 0,
+	});
 	let searchStart = startOfCursorlineOffset;
 
 	let matchText = "";

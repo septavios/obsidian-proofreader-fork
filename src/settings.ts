@@ -1,6 +1,6 @@
 import { PluginSettingTab, Setting } from "obsidian";
-import Proofreader from "./main";
-import { ModelName } from "./providers/adapter";
+import type Proofreader from "./main";
+import type { ModelName } from "./providers/adapter";
 import { MODEL_SPECS } from "./providers/model-info";
 
 export const DEFAULT_SETTINGS = {

@@ -17,7 +17,10 @@ function writeJson(filepath, jsonObj) {
 
 const manifest = readJson("manifest.json");
 const currentVersion = manifest.version;
-const rl = readlinePromises.createInterface({ input: process.stdin, output: process.stdout });
+const rl = readlinePromises.createInterface({
+	input: process.stdin,
+	output: process.stdout,
+});
 
 console.info(`current version: ${currentVersion}`);
 const nextVersion = await rl.question("   next version: ");

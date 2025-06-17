@@ -33,7 +33,9 @@ const result = await esbuild
 
 // DOCS https://esbuild.github.io/api/index#metafile
 if (result.metafile) {
-	const sizes = await esbuild.analyzeMetafile(result.metafile, { verbose: false });
+	const sizes = await esbuild.analyzeMetafile(result.metafile, {
+		verbose: false,
+	});
 	console.info(sizes);
 }
 

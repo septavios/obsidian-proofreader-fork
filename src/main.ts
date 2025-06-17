@@ -1,9 +1,8 @@
 import { Plugin } from "obsidian";
 import { acceptOrRejectInText, acceptOrRejectNextSuggestion } from "./accept-reject-suggestions";
 import { proofreadDocument, proofreadText } from "./proofread";
-import { DEFAULT_SETTINGS, ProofreaderSettings, ProofreaderSettingsMenu } from "./settings";
+import { DEFAULT_SETTINGS, type ProofreaderSettings, ProofreaderSettingsMenu } from "./settings";
 
-// biome-ignore lint/style/noDefaultExport: required for Obsidian plugins to work
 export default class Proofreader extends Plugin {
 	settings: ProofreaderSettings = DEFAULT_SETTINGS;
 

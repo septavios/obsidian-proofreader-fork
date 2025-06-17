@@ -1,10 +1,10 @@
-import { Change, diffWords } from "diff";
-import { Editor, Notice, getFrontMatterInfo } from "obsidian";
+import { type Change, diffWords } from "diff";
+import { type Editor, getFrontMatterInfo, Notice } from "obsidian";
 import { rejectChanges } from "./accept-reject-suggestions";
-import Proofreader from "./main";
-import { ModelName, ProviderAdapter } from "./providers/adapter";
+import type Proofreader from "./main";
+import type { ModelName, ProviderAdapter } from "./providers/adapter";
 import { MODEL_SPECS, PROVIDER_REQUEST_MAP } from "./providers/model-info";
-import { ProofreaderSettings } from "./settings";
+import type { ProofreaderSettings } from "./settings";
 
 function getDiffMarkdown(
 	settings: ProofreaderSettings,
@@ -30,7 +30,11 @@ function getDiffMarkdown(
 			"> [!INFO] End of proofreading\n" +
 			"> The input text was too long. Text after this point is unchanged." +
 			"\n\n";
-		diff.splice(-2, 0, { added: false, removed: false, value: cutOffCallout });
+		diff.splice(-2, 0, {
+			added: false,
+			removed: false,
+			value: cutOffCallout,
+		});
 	}
 
 	// CONVERT DIFF TO TEXT
