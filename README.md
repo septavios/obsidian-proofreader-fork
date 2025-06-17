@@ -74,16 +74,17 @@ feature in word processing apps.
 	  document`. However, note that the quality of AI suggestions tends to
 	  decrease when proofreading too much text at once.
 2. The changes are automatically inserted.
-3. Accept/reject changes with the `Accept suggestions in selection/paragraph`.
+3. Accept/reject changes with `Accept suggestions in selection/paragraph`
+   and `Reject suggestions in selection/paragraph`.  
    Same as the proofreading command, the `accept` and `reject` commands affect
    the current paragraph if there is no selection. Alternatively, you can also
    only accept/reject the next suggestion after your cursor via `Accept next
-   suggestion`.
+   suggestion` and `Reject next suggestion`.
 
 ## Visual appearance of the changes
 You can add the following CSS snippet to make highlights and strikethroughs
-appear like suggested changes, similar to the screenshot further above. ([How
-to add CSS snippets.](https://help.obsidian.md/snippets))
+appear like suggested changes, similar to the screenshot further above.
+([Manual: How to add CSS snippets.](https://help.obsidian.md/snippets))
 
 ```css
 .cm-strikethrough {
