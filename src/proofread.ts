@@ -12,6 +12,8 @@ function getDiffMarkdown(
 	newText: string,
 	isOverlength?: boolean,
 ): { textWithSuggestions: string; changeCount: number } {
+	console.debug("[Proofreader plugin] old text:", oldText);
+	console.debug("[Proofreader plugin] new text:", newText);
 	// ENSURE SAME AMOUNT OF SURROUNDING WHITESPACE
 	// (A selection can have surrounding whitespace, but the AI response usually
 	// removes those. This results in the text effectively being trimmed.)
@@ -19,8 +21,7 @@ function getDiffMarkdown(
 	const trailingWhitespace = oldText.match(/(\s*)$/)?.[0] || "";
 	newText = newText.replace(/^(\s*)/, leadingWhitespace).replace(/(\s*)$/, trailingWhitespace);
 
-	// GET DIFF
-	// DOCS https://github.com/kpdecker/jsdiff#readme
+	// GET DIFF https://github.com/kpdecker/jsdiff#readme
 	const diff = diffWords(oldText, newText);
 	if (isOverlength) {
 		// do not remove text after cutoff-length
@@ -36,6 +37,7 @@ function getDiffMarkdown(
 			value: cutOffCallout,
 		});
 	}
+	console.debug("[Proofreader plugin] diff output:", diff);
 
 	// CONVERT DIFF TO TEXT
 	// with ==highlights== and ~~strikethrough~~ as suggestions
@@ -49,6 +51,7 @@ function getDiffMarkdown(
 			return fixedForObsidian;
 		})
 		.join("");
+	console.debug("[Proofreader plugin] text with diff:", textWithChanges);
 
 	// FIX for Obsidian live preview: isolated trailing markup rendered wrong
 	textWithChanges = textWithChanges.replace(/(==|~~)([^=~]+) \1 /g, "$1$2$1 ");
@@ -78,6 +81,7 @@ function getDiffMarkdown(
 	if (settings.preserveTextInsideQuotes) {
 		textWithChanges = textWithChanges.replace(/"[^"]+"/g, (quote) => rejectChanges(quote));
 	}
+	console.debug("[Proofreader plugin] text after cleanup:", textWithChanges);
 
 	const changeCount = (textWithChanges.match(/==|~~/g)?.length || 0) / 2;
 	return { textWithSuggestions: textWithChanges, changeCount: changeCount };

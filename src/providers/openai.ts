@@ -41,7 +41,6 @@ export const openAiRequest: ProviderAdapter = async (settings, oldText) => {
 		logError(response);
 		return;
 	}
-	console.debug("[Proofreader plugin] New text", newText);
 
 	// determine overlength
 	// https://platform.openai.com/docs/guides/conversation-state?api-mode=responses#managing-context-for-text-generation
