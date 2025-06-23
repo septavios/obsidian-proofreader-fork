@@ -181,13 +181,22 @@ async function validateAndGetChangesAndNotify(
 
 //──────────────────────────────────────────────────────────────────────────────
 
+// prevent multiple requests, e.g., when accidentally using hotkey twice
+let isProofreading = false;
+
 export async function proofreadDocument(plugin: Proofreader, editor: Editor): Promise<void> {
+	if (isProofreading) {
+		new Notice("Already processing a proofreading request.");
+		return;
+	}
+	isProofreading = true;
 	const noteWithFrontmatter = editor.getValue();
 	const bodyStart = getFrontMatterInfo(noteWithFrontmatter).contentStart || 0;
 	const bodyEnd = noteWithFrontmatter.length;
 	const oldText = noteWithFrontmatter.slice(bodyStart);
 
 	const changes = await validateAndGetChangesAndNotify(plugin, oldText, "Document");
+	isProofreading = false;
 	if (!changes) return;
 
 	const bodyStartPos = editor.offsetToPos(bodyStart);
@@ -197,6 +206,11 @@ export async function proofreadDocument(plugin: Proofreader, editor: Editor): Pr
 }
 
 export async function proofreadText(plugin: Proofreader, editor: Editor): Promise<void> {
+	if (isProofreading) {
+		new Notice("Already processing a proofreading request.");
+		return;
+	}
+	isProofreading = true;
 	const hasMultipleSelections = editor.listSelections().length > 1;
 	if (hasMultipleSelections) {
 		new Notice("Multiple selections are not supported.");
@@ -209,6 +223,7 @@ export async function proofreadText(plugin: Proofreader, editor: Editor): Promis
 	const scope = selection ? "Selection" : "Paragraph";
 
 	const changes = await validateAndGetChangesAndNotify(plugin, oldText, scope);
+	isProofreading = false;
 	if (!changes) return;
 
 	if (selection) {
