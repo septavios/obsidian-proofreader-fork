@@ -11,6 +11,7 @@ export const DEFAULT_SETTINGS = {
 	preserveTextInsideQuotes: false,
 	preserveBlockquotes: false,
 	preserveNonSmartPuncation: false,
+	diffWithSpace: false,
 };
 
 export type ProofreaderSettings = typeof DEFAULT_SETTINGS;
@@ -64,7 +65,21 @@ export class ProofreaderSettingsMenu extends PluginSettingTab {
 			});
 
 		//────────────────────────────────────────────────────────────────────────
-		// CLEANUP OPTIONS
+		// DIFF OPTIONS
+		new Setting(containerEl).setName("Diff options").setHeading();
+
+		new Setting(containerEl)
+			.setName("Space-sensitive diff")
+			.setDesc(
+				"Space-sensitive diff processes spaces more accurately, but results in smaller, more numerous changes.",
+			)
+			.addToggle((toggle) =>
+				toggle.setValue(settings.diffWithSpace).onChange(async (value) => {
+					settings.diffWithSpace = value;
+					await this.plugin.saveSettings();
+				}),
+			);
+
 		new Setting(containerEl)
 			.setName("Preserve text inside quotes")
 			.setDesc(

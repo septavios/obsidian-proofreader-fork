@@ -14,6 +14,7 @@ function getDiffMarkdown(
 ): { textWithSuggestions: string; changeCount: number } {
 	console.debug("[Proofreader plugin] old text:", oldText);
 	console.debug("[Proofreader plugin] new text:", newText);
+
 	// ENSURE SAME AMOUNT OF SURROUNDING WHITESPACE
 	// (A selection can have surrounding whitespace, but the AI response usually
 	// removes those. This results in the text effectively being trimmed.)
@@ -23,21 +24,22 @@ function getDiffMarkdown(
 
 	// GET DIFF https://github.com/kpdecker/jsdiff#readme
 	const diffWithSpace = diffWordsWithSpace(oldText, newText);
-	console.debug("[Proofreader plugin] diff output:", diffWithSpace);
-
-	// purely to evaluate difference between the two diff versions
-	const diff = diffWords(oldText, newText);
-	console.debug("[Proofreader plugin] diff with space output:", diff);
+	const diffRegular = diffWords(oldText, newText);
+	const diff = settings.diffWithSpace ? diffWithSpace : diffRegular;
+	console.debug("[Proofreader plugin] regular diff:", diffRegular);
+	console.debug("[Proofreader plugin] diff with space:", diffWithSpace);
+	const use = settings.diffWithSpace ? "diff with space" : "regular diff";
+	console.debug("[Proofreader plugin] using:", use);
 
 	if (isOverlength) {
 		// do not remove text after cutoff-length
-		(diffWithSpace.at(-1) as Change).removed = false;
+		(diff.at(-1) as Change).removed = false;
 		const cutOffCallout =
 			"\n\n" +
 			"> [!INFO] End of proofreading\n" +
 			"> The input text was too long. Text after this point is unchanged." +
 			"\n\n";
-		diffWithSpace.splice(-2, 0, {
+		diff.splice(-2, 0, {
 			added: false,
 			removed: false,
 			value: cutOffCallout,
@@ -46,7 +48,7 @@ function getDiffMarkdown(
 
 	// CONVERT DIFF TO TEXT
 	// with ==highlights== and ~~strikethrough~~ as suggestions
-	let textWithChanges = diffWithSpace
+	let textWithChanges = diff
 		.map((part) => {
 			if (!part.added && !part.removed) return part.value;
 			const withMarkup = part.added ? `==${part.value}==` : `~~${part.value}~~`;
