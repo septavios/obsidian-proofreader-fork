@@ -1,4 +1,4 @@
-import { type Change, diffWords } from "diff";
+import { type Change, diffWords, diffWordsWithSpace } from "diff";
 import { type Editor, getFrontMatterInfo, Notice } from "obsidian";
 import { rejectChanges } from "./accept-reject-suggestions";
 import type Proofreader from "./main";
@@ -22,26 +22,31 @@ function getDiffMarkdown(
 	newText = newText.replace(/^(\s*)/, leadingWhitespace).replace(/(\s*)$/, trailingWhitespace);
 
 	// GET DIFF https://github.com/kpdecker/jsdiff#readme
+	const diffWithSpace = diffWordsWithSpace(oldText, newText);
+	console.debug("[Proofreader plugin] diff output:", diffWithSpace);
+
+	// purely to evaluate difference between the two diff versions
 	const diff = diffWords(oldText, newText);
+	console.debug("[Proofreader plugin] diff with space output:", diff);
+
 	if (isOverlength) {
 		// do not remove text after cutoff-length
-		(diff.at(-1) as Change).removed = false;
+		(diffWithSpace.at(-1) as Change).removed = false;
 		const cutOffCallout =
 			"\n\n" +
 			"> [!INFO] End of proofreading\n" +
 			"> The input text was too long. Text after this point is unchanged." +
 			"\n\n";
-		diff.splice(-2, 0, {
+		diffWithSpace.splice(-2, 0, {
 			added: false,
 			removed: false,
 			value: cutOffCallout,
 		});
 	}
-	console.debug("[Proofreader plugin] diff output:", diff);
 
 	// CONVERT DIFF TO TEXT
 	// with ==highlights== and ~~strikethrough~~ as suggestions
-	let textWithChanges = diff
+	let textWithChanges = diffWithSpace
 		.map((part) => {
 			if (!part.added && !part.removed) return part.value;
 			const withMarkup = part.added ? `==${part.value}==` : `~~${part.value}~~`;
@@ -51,7 +56,7 @@ function getDiffMarkdown(
 			return fixedForObsidian;
 		})
 		.join("");
-	console.debug("[Proofreader plugin] text with diff:", textWithChanges);
+	console.debug("[Proofreader plugin] text with changes:", textWithChanges);
 
 	// FIX for Obsidian live preview: isolated trailing markup rendered wrong
 	textWithChanges = textWithChanges.replace(/(==|~~)([^=~]+) \1 /g, "$1$2$1 ");
