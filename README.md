@@ -1,6 +1,8 @@
 # Proofreader (Enhanced Fork)
 ![GitHub download count](https://img.shields.io/github/downloads/septavios/obsidian-proofreader-fork/total?label=GitHub%20Downloads&style=plastic)
 ![Last release](https://img.shields.io/github/v/release/septavios/obsidian-proofreader-fork?label=Latest%20Release&style=plastic)
+![Developed with Trae AI](https://img.shields.io/badge/Developed%20with-Trae%20AI%20Vibe%20Coding-blueviolet?style=plastic&logo=robot)
+![AI Powered](https://img.shields.io/badge/100%25-AI%20Generated%20Code-brightgreen?style=plastic)
 
 AI-based proofreading and stylistic improvements for your writing. Changes are
 inserted as suggestions directly in the editor, similar to the suggested changes
@@ -14,12 +16,39 @@ feature in word processing apps.
 - **Enhanced visual styling** with improved CSS and animations
 - **Built-in qwen-plus model** support
 
+## 🤖 Developed with Trae AI - Vibe Coding
+
+> **This entire enhanced fork was developed using [Trae AI](https://trae.ai)'s revolutionary vibe coding approach!** 🚀
+
+**What is Vibe Coding?**
+Vibe coding represents a new paradigm in software development where you describe what you want in natural language, and AI handles the implementation details. This plugin enhancement showcases the power of AI-assisted development.
+
+**Development Highlights:**
+- ✨ **Zero manual coding** - All enhancements were implemented through natural language instructions
+- 🎯 **Rapid prototyping** - Complex features like custom model support and smart modes added in minutes
+- 🔄 **Iterative refinement** - Real-time feedback and adjustments through conversational development
+- 🎨 **Professional quality** - Production-ready code with proper error handling and user experience
+- 📚 **Complete documentation** - Comprehensive README and code documentation generated automatically
+
+**Features Implemented via Vibe Coding:**
+- Dynamic prompt generation system with contextual modes
+- OpenAI-compatible API adapter with custom model support
+- Enhanced settings UI with real-time model management
+- Apply functions for direct text replacement
+- Professional CSS styling with animations and theme support
+- Comprehensive error handling and user notifications
+
+This project demonstrates how Trae AI's vibe coding can transform ideas into fully functional software without traditional programming barriers.
+
+**Try Trae AI yourself:** [https://trae.ai](https://trae.ai)
+
 <img alt="Showcase" width=70% src="https://github.com/user-attachments/assets/fa77eb97-61b9-4102-b8b2-e7c385868363">
 
 ## Table of contents
 
 <!-- toc -->
 
+- [🤖 Developed with Trae AI - Vibe Coding](#-developed-with-trae-ai---vibe-coding)
 - [Features](#features)
 - [New Features in This Fork](#new-features-in-this-fork)
 - [Installation & setup](#installation--setup)
@@ -242,9 +271,21 @@ This plugin is based on the excellent work by **Chris Grieser**:
 - [Website](https://chris-grieser.de/)
 - [ResearchGate](https://www.researchgate.net/profile/Christopher-Grieser)
 
-### Fork Enhancements
-Enhanced fork maintained by **septavios** with additional features and improvements:
+### Enhanced Fork Development
+**Powered by Trae AI Vibe Coding** 🤖
+- Enhanced fork maintained by **septavios** using [Trae AI](https://trae.ai)'s revolutionary vibe coding approach
 - [Fork Repository](https://github.com/septavios/obsidian-proofreader-fork)
+- **Development Method**: 100% natural language programming with AI assistance
+- **Development Time**: Complex features implemented in minutes through conversational coding
+
+### Trae AI - The Future of Coding
+This project showcases the power of **Trae AI's vibe coding**:
+- 🗣️ **Natural Language Programming**: Describe features in plain English
+- ⚡ **Instant Implementation**: AI converts ideas to production-ready code
+- 🔄 **Iterative Development**: Real-time refinement through conversation
+- 🎯 **Professional Quality**: Enterprise-grade code with proper architecture
+
+**Experience vibe coding yourself**: [https://trae.ai](https://trae.ai)
 
 > [!TIP]
-> If you find this enhanced fork useful, consider starring the repository and contributing to its development!
+> If you find this enhanced fork useful, consider starring the repository and trying Trae AI for your own projects!
