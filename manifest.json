@@ -1,15 +1,14 @@
 {
-	"id": "proofreader",
-	"name": "Proofreader",
-	"description": "AI-based proofreading and stylistic improvements for your writing. Changes are inserted as suggestions directly in the editor, similar to suggested changes in word processing apps.",
-	"version": "1.3.1",
+	"id": "proofreader-enhanced",
+	"name": "Proofreader Enhanced",
+	"description": "AI-based proofreading with smart modes, custom model support, and enhanced styling. Built with Trae AI vibe coding. Includes Quick Fix, Academic, Creative modes, severity levels, and apply functions for direct text replacement.",
+	"version": "2.0.0",
 	"minAppVersion": "1.5.8",
 	"isDesktopOnly": false,
-	"author": "pseudometa (aka Chris Grieser)",
-	"authorUrl": "https://chris-grieser.de/",
-	"helpUrl": "https://github.com/chrisgrieser/obsidian-proofreader#readme",
+	"author": "septavios (Enhanced with Trae AI)",
+	"authorUrl": "https://github.com/septavios/obsidian-proofreader-fork",
+	"helpUrl": "https://github.com/septavios/obsidian-proofreader-fork#readme",
 	"fundingUrl": {
-		"Ko-Fi": "https://ko-fi.com/pseudometa",
-		"PayPal": "https://www.paypal.me/ChrisGrieser"
+		"GitHub": "https://github.com/septavios/obsidian-proofreader-fork"
 	}
 }
