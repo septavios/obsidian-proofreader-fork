@@ -1,11 +1,18 @@
-# Proofreader
-![Obsidian downloads](https://img.shields.io/badge/dynamic/json?logo=obsidian&color=%23483699&label=downloads&query=%24%5B%22proofreader%22%5D.downloads&url=https%3A%2F%2Fraw.githubusercontent.com%2Fobsidianmd%2Fobsidian-releases%2Fmaster%2Fcommunity-plugin-stats.json&style=plastic)
-![GitHub download count](https://img.shields.io/github/downloads/chrisgrieser/obsidian-proofreader/total?label=GitHub%20Downloads&style=plastic)
-![Last release](https://img.shields.io/github/v/release/chrisgrieser/obsidian-proofreader?label=Latest%20Release&style=plastic)
+# Proofreader (Enhanced Fork)
+![GitHub download count](https://img.shields.io/github/downloads/septavios/obsidian-proofreader-fork/total?label=GitHub%20Downloads&style=plastic)
+![Last release](https://img.shields.io/github/v/release/septavios/obsidian-proofreader-fork?label=Latest%20Release&style=plastic)
 
 AI-based proofreading and stylistic improvements for your writing. Changes are
 inserted as suggestions directly in the editor, similar to the suggested changes
 feature in word processing apps.
+
+**🚀 This enhanced fork includes:**
+- **Custom model support** with easy-to-use UI
+- **Smart proofreading modes** (Quick Fix, Balanced, Style Improvement, Academic, Creative)
+- **Severity levels** (Minor, Moderate, Major corrections)
+- **Apply functions** for direct text replacement without suggestions
+- **Enhanced visual styling** with improved CSS and animations
+- **Built-in qwen-plus model** support
 
 <img alt="Showcase" width=70% src="https://github.com/user-attachments/assets/fa77eb97-61b9-4102-b8b2-e7c385868363">
 
@@ -14,10 +21,15 @@ feature in word processing apps.
 <!-- toc -->
 
 - [Features](#features)
+- [New Features in This Fork](#new-features-in-this-fork)
 - [Installation & setup](#installation--setup)
 	* [Plugin installation](#plugin-installation)
 	* [Get an OpenAI API key](#get-an-openai-api-key)
+	* [Custom Models Setup](#custom-models-setup)
 - [Usage](#usage)
+	* [Basic Proofreading](#basic-proofreading)
+	* [Smart Proofreading Modes](#smart-proofreading-modes)
+	* [Apply Functions](#apply-functions)
 - [Visual appearance of the changes](#visual-appearance-of-the-changes)
 - [Testimonials](#testimonials)
 - [Plugin development](#plugin-development)
@@ -32,6 +44,10 @@ feature in word processing apps.
   `==highlights==` and removals as `~~strikethroughs~~`.
 - Accept or reject changes with just one hotkey.
 - Easy to use: No complicated plugin settings and AI parameters to configure.
+- **NEW**: Custom model support for any OpenAI-compatible API
+- **NEW**: Smart proofreading modes tailored for different writing styles
+- **NEW**: Apply functions for immediate text correction
+- **NEW**: Enhanced visual styling with animations and hover effects
 
 |                                       | Professional proofreading service               | Proofreader plugin                                                           |
 | ----------------------------------    | ----------------------------------------------- | ---------------------------------------------------------------------------- |
@@ -47,14 +63,48 @@ feature in word processing apps.
 	usage costs [on this page](https://platform.openai.com/usage).
 
 > [!NOTE]
-> This plugin requires an **OpenAI API key** and incurs costs at OpenAI based on
-> usage. Network requests are made when running the proofreading command. (PRs
-> [adding support for other LLMs](#adding-support-for-new-llms) are welcome.)
+> This plugin supports **OpenAI API** and **custom OpenAI-compatible APIs** and incurs costs based on
+> usage. Network requests are made when running the proofreading command.
+
+## New Features in This Fork
+
+### 🎯 Smart Proofreading Modes
+Choose from different proofreading approaches:
+- **Quick Fix**: Fast corrections for obvious errors
+- **Balanced**: Standard proofreading with moderate improvements
+- **Style Improvement**: Focus on enhancing writing style and flow
+- **Academic**: Formal, precise language suitable for academic writing
+- **Creative**: Preserve creative voice while improving clarity
+
+### 📊 Severity Levels
+Control the extent of corrections:
+- **Minor**: Only fix clear errors, minimal changes
+- **Moderate**: Standard corrections and improvements
+- **Major**: Comprehensive rewriting and restructuring
+
+### 🔧 Custom Model Support
+- Add any OpenAI-compatible model through the settings UI
+- Built-in support for popular models including qwen-plus
+- Easy model management with add/remove functionality
+- Support for custom API endpoints
+
+### ⚡ Apply Functions
+New commands for immediate text replacement:
+- `Apply proofreading to selection/paragraph` - Direct corrections without suggestions
+- `Apply proofreading to full document` - Immediate document-wide corrections
+
+### 🎨 Enhanced Visual Styling
+- Improved CSS with smooth animations
+- Theme-specific optimizations for light and dark modes
+- Hover effects and tooltips for better user experience
+- Professional appearance with rounded corners and shadows
 
 ## Installation & setup
 
 ### Plugin installation
-[Install in Obsidian](https://obsidian.md/plugins?id=proofreader)
+1. Download the latest release from [GitHub Releases](https://github.com/septavios/obsidian-proofreader-fork/releases)
+2. Extract the files to your Obsidian plugins folder: `.obsidian/plugins/obsidian-proofreader/`
+3. Enable the plugin in Obsidian's Community Plugins settings
 
 ### Get an OpenAI API key
 1. [Create an OpenAI account](https://auth.openai.com/create-account).
@@ -63,11 +113,23 @@ feature in word processing apps.
 3. Copy the API key.
 4. In Obsidian, go to `Settings → Proofreader` and paste your API key there.
 
+### Custom Models Setup
+1. Go to `Settings → Proofreader → Custom Models`
+2. Click "Add Custom Model"
+3. Enter:
+   - **Model ID**: The model identifier (e.g., `qwen-plus`, `claude-3-sonnet`)
+   - **Display Name**: How it appears in the dropdown
+   - **Provider**: Select the appropriate provider
+   - **API Endpoint** (if needed): Custom API endpoint URL
+4. Click "Add Model"
+
 > [!TIP]
 > The usage costs should not be very high, nonetheless you can track them
 > [on this page](https://platform.openai.com/usage).
 
 ## Usage
+
+### Basic Proofreading
 1. Use the command `Proofread selection/paragraph` to check the selected
    text. If there is no selection, the command will check the current paragraph.
 	* Alternatively, you can also check the whole document with `Proofread full
@@ -81,9 +143,34 @@ feature in word processing apps.
    only accept/reject the next suggestion after your cursor via `Accept next
    suggestion` and `Reject next suggestion`.
 
+### Smart Proofreading Modes
+1. Go to `Settings → Proofreader`
+2. Select your preferred **Proofreading Mode**:
+   - **Quick Fix**: For fast, obvious corrections
+   - **Balanced**: Standard proofreading (default)
+   - **Style Improvement**: Enhanced writing style
+   - **Academic**: Formal, academic tone
+   - **Creative**: Preserve creative voice
+3. Choose **Severity Level**:
+   - **Minor**: Minimal changes
+   - **Moderate**: Standard corrections (default)
+   - **Major**: Comprehensive improvements
+
+### Apply Functions
+For immediate corrections without review:
+1. Use `Apply proofreading to selection/paragraph` for direct text replacement
+2. Use `Apply proofreading to full document` for immediate document-wide corrections
+3. Text is replaced instantly without showing suggestions
+
 ## Visual appearance of the changes
-You can add the following CSS snippet to make highlights and strikethroughs
-appear like suggested changes, similar to the screenshot further above.
+The plugin now includes enhanced CSS styling by default. The visual improvements include:
+- Smooth animations for new suggestions
+- Improved contrast and readability
+- Hover effects with tooltips
+- Theme-specific optimizations
+- Professional rounded corners and shadows
+
+For additional customization, you can still add CSS snippets:
 ([Manual: How to add CSS snippets.](https://help.obsidian.md/snippets))
 
 ```css
@@ -108,37 +195,56 @@ appear like suggested changes, similar to the screenshot further above.
 ### General
 
 ```bash
-just init   # run once after cloning
+# Clone the repository
+git clone https://github.com/septavios/obsidian-proofreader-fork.git
+cd obsidian-proofreader-fork
 
-just format # run all formatters
-just build  # builds the plugin
-just check  # runs the pre-commit hook (without committing)
+# Install dependencies
+npm install
+
+# Build the plugin
+npm run build
+# or use the esbuild script
+node .esbuild.mjs
 ```
 
-> [!NOTE]
-> This repo uses a pre-commit hook, which prevents commits that do not build or
-> do not pass the checks.
+### Key Files in This Fork
+- **src/prompt-generator.ts**: Dynamic prompt generation for different modes and severity levels
+- **src/providers/openai-compatible.ts**: Generic adapter for OpenAI-compatible APIs
+- **src/settings.ts**: Enhanced settings with custom model management
+- **styles.css**: Enhanced visual styling with animations and theme support
 
 ### Adding support for new LLMs
-1. Create a new adapter for the LLM in
-   [./src/providers/](./src/providers/). This should take ~50 lines of code.
-2. In [./src/providers/model-info.ts](./src/providers/model-info.ts), add the
-   adapter function to `PROVIDER_ADAPTER_MAP`, and add models for the new
-   provider to `MODEL_SPECS`.
-3. In [./src/settings.ts], add a setting for the API key to
-   `ProofreaderSettingsMenu` and add a field to `DEFAULT_SETTINGS`.
+This fork includes enhanced support for custom models:
 
-## About the developer
-In my day job, I am a sociologist studying the social mechanisms underlying the
-digital economy. For my PhD project, I investigate the governance of the app
-economy and how software ecosystems manage the tension between innovation and
-compatibility. If you are interested in this subject, feel free to get in touch.
+1. **Easy Method**: Use the Custom Models UI in settings to add any OpenAI-compatible API
+2. **Advanced Method**: 
+   - Create a new adapter in [./src/providers/](./src/providers/)
+   - Add the adapter to `PROVIDER_ADAPTER_MAP` in [./src/providers/model-info.ts](./src/providers/model-info.ts)
+   - Add models to `MODEL_SPECS` in the same file
+   - Add API key settings in [./src/settings.ts](./src/settings.ts)
 
+### Contributing
+This is an enhanced fork of the original [obsidian-proofreader](https://github.com/chrisgrieser/obsidian-proofreader) by Chris Grieser. 
+
+**New features in this fork:**
+- Custom model support with UI
+- Smart proofreading modes and severity levels
+- Apply functions for direct text replacement
+- Enhanced visual styling and animations
+- Built-in support for additional models
+
+## Credits
+
+### Original Developer
+This plugin is based on the excellent work by **Chris Grieser**:
+- [Original Repository](https://github.com/chrisgrieser/obsidian-proofreader)
 - [Website](https://chris-grieser.de/)
 - [ResearchGate](https://www.researchgate.net/profile/Christopher-Grieser)
-- [Mastodon](https://pkm.social/@pseudometa)
-- [LinkedIn](https://www.linkedin.com/in/christopher-grieser-ba693b17a/)
 
-<a href='https://ko-fi.com/Y8Y86SQ91' target='_blank'> <img height='36'
-style='border:0px;height:36px;' src='https://cdn.ko-fi.com/cdn/kofi1.png?v=3'
-border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+### Fork Enhancements
+Enhanced fork maintained by **septavios** with additional features and improvements:
+- [Fork Repository](https://github.com/septavios/obsidian-proofreader-fork)
+
+> [!TIP]
+> If you find this enhanced fork useful, consider starring the repository and contributing to its development!
