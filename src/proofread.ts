@@ -3,7 +3,7 @@ import { type Editor, getFrontMatterInfo, Notice } from "obsidian";
 import { rejectChanges } from "src/accept-reject-suggestions";
 import type Proofreader from "src/main";
 import type { ModelName, ProviderAdapter } from "src/providers/adapter";
-import { MODEL_SPECS, PROVIDER_REQUEST_MAP } from "src/providers/model-info";
+import { MODEL_SPECS, PROVIDER_REQUEST_MAP, getModelSpec } from "src/providers/model-info";
 import type { ProofreaderSettings } from "src/settings";
 
 function getDiffMarkdown(
@@ -94,6 +94,73 @@ function getDiffMarkdown(
 	return { textWithSuggestions: textWithChanges, changeCount: changeCount };
 }
 
+async function validateAndGetRewriteAndNotify(
+	plugin: Proofreader,
+	oldText: string,
+	scope: string,
+): Promise<string | undefined> {
+	const { app, settings } = plugin;
+
+	// GUARD outdated model
+	const model = getModelSpec(settings.model, settings);
+	if (!model) {
+		const errmsg = `⚠️ The model "${settings.model}" is not available. Please select a different one in the settings.`;
+		new Notice(errmsg, 10_000);
+		return;
+	}
+	// GUARD valid start-text
+	if (oldText.trim() === "") {
+		new Notice(`${scope} is empty.`);
+		return;
+	}
+
+	// parameters
+	const fileBefore = app.workspace.getActiveFile()?.path;
+	const longInput = oldText.length > 1500;
+	const veryLongInput = oldText.length > 15000;
+	const notifDuration = longInput ? 0 : 4_000;
+
+	// notify on start
+	let msgBeforeRequest = `🔄 ${scope} is being rewritten…`;
+	if (longInput) {
+		msgBeforeRequest += "\n\nDue to the length of the text, this may take a moment.";
+		if (veryLongInput) msgBeforeRequest += " (A minute or longer.)";
+		msgBeforeRequest +=
+			"\n\nDo not go to a different file or change the original text in the meantime.";
+	}
+	const notice = new Notice(msgBeforeRequest, 0);
+
+	// perform request
+	const requestFunc: ProviderAdapter = PROVIDER_REQUEST_MAP[model.provider];
+	const { newText, isOverlength } = (await requestFunc(settings, oldText)) || {};
+	notice.hide();
+	if (!newText) return;
+
+	// check if active file changed
+	const fileAfter = app.workspace.getActiveFile()?.path;
+	if (fileBefore !== fileAfter) {
+		const errmsg = "⚠️ The active file changed since the rewrite has been triggered. Aborting.";
+		new Notice(errmsg, notifDuration);
+		return;
+	}
+
+	// Apply whitespace preservation for consistency
+	const leadingWhitespace = oldText.match(/^(\s*)/)?.[0] || "";
+	const trailingWhitespace = oldText.match(/(\s*)$/)?.[0] || "";
+	const finalText = newText.replace(/^(\s*)/, leadingWhitespace).replace(/(\s*)$/, trailingWhitespace);
+
+	// notify on completion
+	if (isOverlength) {
+		const msg =
+			"Text is longer than the maximum output supported by the AI model.\n\n" +
+			"Rewrite is thus only applied until the cut-off point.";
+		new Notice(msg, 10_000);
+	}
+	new Notice(`✅ ${scope} has been rewritten.`, notifDuration);
+
+	return finalText;
+}
+
 async function validateAndGetChangesAndNotify(
 	plugin: Proofreader,
 	oldText: string,
@@ -102,9 +169,9 @@ async function validateAndGetChangesAndNotify(
 	const { app, settings } = plugin;
 
 	// GUARD outdated model
-	const model = MODEL_SPECS[settings.model as ModelName];
+	const model = getModelSpec(settings.model, settings);
 	if (!model) {
-		const errmsg = `⚠️ The model "${settings.model}" is outdated. Please select a more recent one in the settings.`;
+		const errmsg = `⚠️ The model "${settings.model}" is not available. Please select a different one in the settings.`;
 		new Notice(errmsg, 10_000);
 		return;
 	}
@@ -231,6 +298,57 @@ export async function proofreadText(plugin: Proofreader, editor: Editor): Promis
 		editor.setCursor(cursor); // to start of selection
 	} else {
 		editor.setLine(cursor.line, changes);
+		editor.setCursor({ line: cursor.line, ch: 0 }); // to start of paragraph
+	}
+}
+
+export async function applyProofreadDocument(plugin: Proofreader, editor: Editor): Promise<void> {
+	if (isProofreading) {
+		new Notice("Already processing a proofreading request.");
+		return;
+	}
+	isProofreading = true;
+	const noteWithFrontmatter = editor.getValue();
+	const bodyStart = getFrontMatterInfo(noteWithFrontmatter).contentStart || 0;
+	const bodyEnd = noteWithFrontmatter.length;
+	const oldText = noteWithFrontmatter.slice(bodyStart);
+
+	const rewrittenText = await validateAndGetRewriteAndNotify(plugin, oldText, "Document");
+	isProofreading = false;
+	if (!rewrittenText) return;
+
+	const bodyStartPos = editor.offsetToPos(bodyStart);
+	const bodyEndPos = editor.offsetToPos(bodyEnd);
+	editor.replaceRange(rewrittenText, bodyStartPos, bodyEndPos);
+	editor.setCursor(bodyStartPos); // to start of doc
+}
+
+export async function applyProofreadText(plugin: Proofreader, editor: Editor): Promise<void> {
+	if (isProofreading) {
+		new Notice("Already processing a proofreading request.");
+		return;
+	}
+	isProofreading = true;
+	const hasMultipleSelections = editor.listSelections().length > 1;
+	if (hasMultipleSelections) {
+		new Notice("Multiple selections are not supported.");
+		return;
+	}
+
+	const cursor = editor.getCursor("from"); // `from` gives start if selection
+	const selection = editor.getSelection();
+	const oldText = selection || editor.getLine(cursor.line);
+	const scope = selection ? "Selection" : "Paragraph";
+
+	const rewrittenText = await validateAndGetRewriteAndNotify(plugin, oldText, scope);
+	isProofreading = false;
+	if (!rewrittenText) return;
+
+	if (selection) {
+		editor.replaceSelection(rewrittenText);
+		editor.setCursor(cursor); // to start of selection
+	} else {
+		editor.setLine(cursor.line, rewrittenText);
 		editor.setCursor({ line: cursor.line, ch: 0 }); // to start of paragraph
 	}
 }

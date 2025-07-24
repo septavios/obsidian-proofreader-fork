@@ -1,6 +1,6 @@
 import { Plugin } from "obsidian";
 import { acceptOrRejectInText, acceptOrRejectNextSuggestion } from "src/accept-reject-suggestions";
-import { proofreadDocument, proofreadText } from "src/proofread";
+import { proofreadDocument, proofreadText, applyProofreadDocument, applyProofreadText } from "src/proofread";
 import { DEFAULT_SETTINGS, type ProofreaderSettings, ProofreaderSettingsMenu } from "src/settings";
 
 export default class Proofreader extends Plugin {
@@ -23,6 +23,18 @@ export default class Proofreader extends Plugin {
 			name: "Proofread full document",
 			editorCallback: (editor): Promise<void> => proofreadDocument(this, editor),
 			icon: "bot-message-square",
+		});
+		this.addCommand({
+			id: "apply-proofread-selection-paragraph",
+			name: "Apply proofreading to selection/paragraph",
+			editorCallback: (editor): Promise<void> => applyProofreadText(this, editor),
+			icon: "wand-2",
+		});
+		this.addCommand({
+			id: "apply-proofread-full-document",
+			name: "Apply proofreading to full document",
+			editorCallback: (editor): Promise<void> => applyProofreadDocument(this, editor),
+			icon: "wand-2",
 		});
 		this.addCommand({
 			id: "accept-suggestions-in-text",
@@ -79,6 +91,13 @@ export default class Proofreader extends Plugin {
 			settings.openAiModel = undefined;
 			this.saveData(settings);
 		}
+
+		// Ensure new settings have default values
+		if (settings.customApiKey === undefined) settings.customApiKey = "";
+		if (settings.customApiEndpoint === undefined) settings.customApiEndpoint = "";
+		if (settings.customModels === undefined) settings.customModels = [];
+		if (settings.proofreadingMode === undefined) settings.proofreadingMode = "balanced";
+		if (settings.severityLevel === undefined) settings.severityLevel = "moderate";
 
 		this.settings = settings;
 	}

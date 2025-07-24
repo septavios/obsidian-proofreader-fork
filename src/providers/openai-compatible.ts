@@ -4,36 +4,51 @@ import { getModelSpec } from "src/providers/model-info";
 import { getEffectivePrompt } from "src/prompt-generator";
 import { logError } from "src/utils";
 
-export const openAiRequest: ProviderAdapter = async (settings, oldText) => {
-	if (!settings.openAiApiKey) {
-		new Notice("Please set your OpenAI API key in the plugin settings.");
+export const openAiCompatibleRequest: ProviderAdapter = async (settings, oldText) => {
+	if (!settings.customApiKey) {
+		new Notice("Please set your custom API key in the plugin settings.");
+		return;
+	}
+
+	if (!settings.customApiEndpoint) {
+		new Notice("Please set your custom API endpoint in the plugin settings.");
 		return;
 	}
 
 	const model = getModelSpec(settings.model, settings);
 	const effectivePrompt = getEffectivePrompt(settings);
 
+	// Ensure the endpoint ends with the correct path
+	let endpoint = settings.customApiEndpoint.trim();
+	if (!endpoint.endsWith('/chat/completions')) {
+		if (endpoint.endsWith('/')) {
+			endpoint += 'chat/completions';
+		} else {
+			endpoint += '/chat/completions';
+		}
+	}
+
 	let response: RequestUrlResponse;
 	try {
-		// DOCS https://platform.openai.com/docs/api-reference/chat
+		// Use OpenAI-compatible API format
 		response = await requestUrl({
-			url: "https://api.openai.com/v1/chat/completions",
+			url: endpoint,
 			method: "POST",
 			contentType: "application/json",
 			// biome-ignore lint/style/useNamingConvention: not by me
-			headers: { Authorization: "Bearer " + settings.openAiApiKey },
+			headers: { Authorization: "Bearer " + settings.customApiKey },
 			body: JSON.stringify({
 				model: settings.model,
 				messages: [
-					{ role: "developer", content: effectivePrompt },
+					{ role: "system", content: effectivePrompt },
 					{ role: "user", content: oldText },
 				],
 			}),
 		});
-		console.debug("[Proofreader plugin] OpenAI response", response);
+		console.debug("[Proofreader plugin] Custom API response", response);
 	} catch (error) {
 		if ((error as { status: number }).status === 401) {
-			const msg = "OpenAI API key is not valid. Please verify the key in the plugin settings.";
+			const msg = "Custom API key is not valid. Please verify the key in the plugin settings.";
 			new Notice(msg, 6_000);
 			return;
 		}
@@ -47,7 +62,6 @@ export const openAiRequest: ProviderAdapter = async (settings, oldText) => {
 	}
 
 	// determine overlength
-	// https://platform.openai.com/docs/guides/conversation-state?api-mode=responses#managing-context-for-text-generation
 	const outputTokensUsed = response.json?.usage?.completion_tokens || 0;
 	const isOverlength = outputTokensUsed >= model.maxOutputTokens;
 

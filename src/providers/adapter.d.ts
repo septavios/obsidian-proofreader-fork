@@ -11,5 +11,5 @@ export type ProviderAdapter = (
 	oldText: string,
 ) => Promise<ProviderResponse | undefined>;
 
-export type ModelName = keyof typeof MODEL_SPECS;
-export type ProviderName = (typeof MODEL_SPECS)[ModelName]["provider"];
+export type ModelName = keyof typeof MODEL_SPECS | string; // Allow custom model IDs
+export type ProviderName = (typeof MODEL_SPECS)[keyof typeof MODEL_SPECS]["provider"];
